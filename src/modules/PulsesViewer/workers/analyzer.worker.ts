@@ -36,14 +36,24 @@ export interface ISliceGuessResult {
 }
 
 
-export type BitsHints = [number, number, "X" | "O" | "1", number, number]
-export type IBitsHintsGroup = BitsHints[] & { 
+export type BitsHints = [number, number, "X" | "O" | "1"]
+export type IBitsHintsGroup = BitsHints[] & {
   // asd: number
   bbuf: Bitbuffer
   range: [number, number]
   scaledRange: [number, number]
   bytes: BitsHints[]
   hex: string
+}
+
+export type Hint = {
+  id: number
+  x1: number
+  x2: number
+  scaledX1: number
+  scaledX2: number
+  scaledWidth: number
+  label: string
 }
 
 
@@ -112,6 +122,27 @@ interface SharedWorkerGlobalScope {
 
 const _self: SharedWorkerGlobalScope = self as any;
 
+function createHintsGroups(_hints: BitsHints[], xScale: Function) {
+  const hints = _hints.map((h, id) => {
+    return {
+      id, x1: h[0], x2: h[1],
+      scaledX1: xScale(h[0]), scaledX2: xScale(h[1]),
+      scaledWidth: xScale(h[1] - h[0]),
+      label: h[2],
+    }
+  })
+  const groups = splitArrayWithDelimiter(hints, (h: Hint, i: number, arr: Hint[]) => {
+    let prev = arr[i - 1]
+    let hasBreak = !prev || prev.x2 !== h.x1
+    return hasBreak || h.label === "X"
+  })
+  return groups.map((g) => {
+    return {
+      bits: g.toSorted((a, b) => a.scaledWidth - b.scaledWidth),
+    }
+  })
+}
+
 _self.onconnect = (e) => {
   const port = e.ports[0];
   port.onmessage = (e) => {
@@ -134,6 +165,11 @@ _self.onconnect = (e) => {
     guessed.modulation = pickedSlicer || guessed.modulation
     const sg = sliceGuess(pulses, guessed) as ISliceGuessResult
 
+    const hintsGroups = createHintsGroups(sg.hints, xScale)
+    sg.hintsGroups = hintsGroups
+
+
+
     sg.hints?.forEach((h) => {
       h[0] += firstPulse.time
       h[1] += firstPulse.time
@@ -143,6 +179,7 @@ _self.onconnect = (e) => {
     })
     sg.hex = sg.bits?.toHexString()
     sg.bytesHints = bytesHints(sg.hints)
+
 
     const result: IAnalyzerWorkerResult = {
       measurementID, analyzer, guessed, sliceGuess: sg
