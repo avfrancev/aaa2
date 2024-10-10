@@ -1,0 +1,91 @@
+<template lang="pug">
+div 
+  PulsesViewSVGHelpers
+  //- pre {{ ZT }} 
+  //- pre >>> {{ getPulsesStore()?.data.size }}
+  div
+    button.btn(@click="pulsesStore?.add(sample_data[Math.floor(Math.random() * sample_data.length)])") Add sample pulses
+    button.btn(@click="pulsesStore?.add(addRandom())") Add rand pulses
+    button.btn(@click="pulsesStore.saveToStorage()") saveToStorage
+  //- div( v-for="f in pulsesStore.data" :key="f.id")
+    button.btn(@click="f.xOffset.value -= 111") xOffset {{ f.xOffset }}
+    button.btn(@click="console.log(f)") log
+    //- pre {{f}}
+  //- pre {{ [...pulsesStore.data].map((d) => d.viewBox) }}
+  //- pre {{ [pulsesStore.minX] }}
+  div(
+    ref="viewEl"
+    class="relative py-2"
+    )
+    //- pre(
+      v-for="p in pulsesStore.data"
+      :key="p.id"
+      ) {{ p.id }}
+    PulsesViewItem(
+      v-for="p in pulsesStore.data"
+      :key="p.id"
+      v-bind="{ pulses: p }"
+      )
+    //- pre {{ state }}
+    //- pre {{ height }} {{ width }}
+    //- pre {{ticksArrayString}}
+    svg(
+      class="w-full absolute inset-0 pointer-events-none select-none touch-none -z-10 overflow-hidden fill-slate-700/30"
+      :viewBox="`${view.viewportLeft.value} 0 ${view.viewportWidth.value} ${height}`"
+      preserveAspectRatio="none"
+      :height="height")
+      path(
+        class="stroke-base-content/50"
+        stroke-width="1"
+        stroke-dasharray="8 10"
+        :transform="`matrix(${1},0,0,1,${view.mouseX.value},0)`"
+        :d="`M ${0},0 V${height}`")
+      path(
+        class="stroke-base-content/20"
+        stroke-dasharray="8 10"
+        stroke-width="1"
+        :d="ticks.reduce((acc: string, t: number) => acc + `M ${pulsesStore?.xScale.value(t)},0 V${height} `, '')"
+        )
+      foreignObject.pointer-events-nones(
+        :transform="`matrix(${1 / ZT.k},0,0,1,${0},0)`"
+        :width="width * ZT.k"
+        height="100"
+        )
+        div.absolute(
+          v-for="t in ticks"
+          class="-translate-x-1/2 text-xs"
+          :style="`left: ${(pulsesStore?.xScale.value(t) || 0 )/ width * 100}%;`"
+        ) {{ t / 1000 }}
+</template>
+
+<script lang="ts" setup>
+import sample_data from '~/stores/sample_data.json'
+import type { PulsesStorage } from '../models/Pulses';
+
+const viewEl = ref()
+const viewStore = useViewStore()
+viewStore.init(viewEl)
+const {view } = viewStore
+const { ZT, elBounds: { width, height} } = view
+
+const pulsesStore = usePulsesStore()
+
+
+const ticksArrayString = computed<string>(() => {
+  if (!pulsesStore.xScale) return ''
+  return view.ZT.rescaleX(pulsesStore.xScale.value).ticks(6).toString()
+})
+
+const ticks = computed(() => {
+  return JSON.parse(`[${ticksArrayString.value}]`) || []
+})
+
+function addRandom(l = 100, max = 1000) {
+  return <PulsesStorage>{
+    raw_data: Array.from({ length: l }).map(() => Math.random() * max + 100),
+    xOffset: Math.random() * max,
+    measurements: new Set(),
+  }
+}
+
+</script>
