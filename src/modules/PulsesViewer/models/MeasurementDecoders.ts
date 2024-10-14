@@ -60,6 +60,7 @@ export class Decoder {
           rangeIds: m.rangeIds.value,
           pickedSlicer: null,
           firstPulse: m.firstPulse.value,
+          lastPulse: m.lastPulse.value,
         } as IAnalyzerWorkerArgs
         // m.firstPulse.value.
         // worker.postMessage(args)

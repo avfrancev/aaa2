@@ -15,6 +15,7 @@ export interface IAnalyzerWorkerArgs {
   }
   pickedSlicer: string | null
   firstPulse: PulsesItem
+  lastPulse: PulsesItem
 }
 
 export interface IAnalyzerWorkerResult {
@@ -23,8 +24,9 @@ export interface IAnalyzerWorkerResult {
   guessed?: ReturnType<Analyzer['guess']>
   sliceGuess?: {
     hints: any[][]
-    bytesHints: IBitsHintsGroup[]
+    // bytesHints: IBitsHintsGroup[]
     bits: Bitbuffer
+    hintsGroups: HintsGroups
   }
 }
 
@@ -35,6 +37,7 @@ export interface ISliceGuessResult {
   hex: string
 }
 
+export type HintsGroups = ReturnType<typeof createHintsGroups>
 
 export type BitsHints = [number, number, "X" | "O" | "1"]
 export type IBitsHintsGroup = BitsHints[] & {
@@ -44,6 +47,7 @@ export type IBitsHintsGroup = BitsHints[] & {
   scaledRange: [number, number]
   bytes: BitsHints[]
   hex: string
+  hintsGroups: HintsGroups
 }
 
 export type Hint = {
@@ -114,20 +118,40 @@ function splitArrayWithDelimiter<T>(arr: T[] = [], delimiterCallback: Function) 
   return result.filter((g) => g.length)
 }
 
-const timeBisector = bisector((d: PulsesItem) => d.time)
-
 interface SharedWorkerGlobalScope {
   onconnect: (event: MessageEvent) => void;
 }
 
-const _self: SharedWorkerGlobalScope = self as any;
+function createBytesHints(g: Hint[]) {
+  const bbuf = new Bitbuffer()
+  for (const h of g) {
+    bbuf.pushSymbol(h.label)
+  }
+  return bbuf.bytes.map((byte: string, i: number) => {
+    let startBit = g[i * 8]
+    let endBit = g[i * 8 + 7]
+    if (!endBit) endBit = g[g.length - 1]
+    let x1 = startBit.x1
+    let x2 = endBit.x2
+    let scaledX1 = startBit.scaledX1
+    let scaledX2 = endBit.scaledX2
+    let scaledWidth = scaledX2 - scaledX1
+    // let h = [x1, x2, byte, scaledx1, scaledx2, i * 8, i * 8 + 7]
+    // console.log(h, startBit, endBit);
+    return {id: i, x1, x2, scaledX1, scaledX2, scaledWidth, label: byte} as Hint
+  })
+}
 
-function createHintsGroups(_hints: BitsHints[], xScale: Function) {
+function createHintsGroups(_hints: BitsHints[], xScale: Function, firstPulse: PulsesItem, lastPulse: PulsesItem) {
   const hints = _hints.map((h, id) => {
+    const x1 = h[0] + firstPulse.time
+    const x2 = h[1] ? (h[1] + firstPulse.time) : lastPulse.time
+    const scaledX1 = xScale(x1)
+    const scaledX2 = xScale(x2)
+    const scaledWidth = scaledX2 - scaledX1
     return {
-      id, x1: h[0], x2: h[1],
-      scaledX1: xScale(h[0]), scaledX2: xScale(h[1]),
-      scaledWidth: xScale(h[1] - h[0]),
+      id, x1, x2, 
+      scaledX1, scaledX2, scaledWidth,
       label: h[2],
     }
   })
@@ -138,10 +162,18 @@ function createHintsGroups(_hints: BitsHints[], xScale: Function) {
   })
   return groups.map((g) => {
     return {
-      bits: g.toSorted((a, b) => a.scaledWidth - b.scaledWidth),
+      bits: g.toSorted((a, b) => b.scaledWidth - a.scaledWidth),
+      bytes: createBytesHints(g).toSorted((a, b) => b.scaledWidth - a.scaledWidth),
+      x1: g[0].x1,
+      x2: g[g.length - 1].x2,
+      scaledX1: g[0].scaledX1,
+      scaledX2: g[g.length - 1].scaledX2,
+      scaledWidth: g[g.length - 1].scaledX2 - g[0].scaledX1,
     }
   })
 }
+
+const _self: SharedWorkerGlobalScope = self as any;
 
 _self.onconnect = (e) => {
   const port = e.ports[0];
@@ -153,6 +185,7 @@ _self.onconnect = (e) => {
       scale,
       pickedSlicer,
       firstPulse,
+      lastPulse,
     } = e.data as IAnalyzerWorkerArgs
 
     let xScale = scaleLinear().domain(scale.domain).range(scale.range)
@@ -165,24 +198,23 @@ _self.onconnect = (e) => {
     guessed.modulation = pickedSlicer || guessed.modulation
     const sg = sliceGuess(pulses, guessed) as ISliceGuessResult
 
-    const hintsGroups = createHintsGroups(sg.hints, xScale)
-    sg.hintsGroups = hintsGroups
+    const hintsGroups = createHintsGroups(sg.hints, xScale, firstPulse, lastPulse)
+    // sg.hintsGroups = hintsGroups
 
 
-
-    sg.hints?.forEach((h) => {
-      h[0] += firstPulse.time
-      h[1] += firstPulse.time
-      h[3] = xScale(h[0])
-      h[4] = xScale(h[1])
-      // h[5] = h[4] - h[3]
-    })
-    sg.hex = sg.bits?.toHexString()
-    sg.bytesHints = bytesHints(sg.hints)
+    // sg.hints?.forEach((h) => {
+    //   h[0] += firstPulse.time
+    //   h[1] += firstPulse.time
+    //   h[3] = xScale(h[0])
+    //   h[4] = xScale(h[1])
+    //   // h[5] = h[4] - h[3]
+    // })
+    // sg.hex = sg.bits?.toHexString()
+    // sg.bytesHints = bytesHints(sg.hints)
 
 
     const result: IAnalyzerWorkerResult = {
-      measurementID, analyzer, guessed, sliceGuess: sg
+      measurementID, analyzer, guessed, sliceGuess: {...sg, hintsGroups}
     }
     port.postMessage(result)
   }
