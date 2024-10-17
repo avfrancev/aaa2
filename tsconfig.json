@@ -3,7 +3,7 @@
     "plugins": ["@vue/language-plugin-pug"]
   },
   "compilerOptions": {
-    "target": "es2016",
+    "target": "ES2017",
     "jsx": "preserve",
     "lib": ["DOM", "ESNext"],
     "baseUrl": "./",

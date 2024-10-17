@@ -1,27 +1,23 @@
 import { v4 as uuidv4 } from 'uuid'
 
+export const useSessionsStore = createGlobalState(() => {
 
-interface ISession {
-  id: string
-}
+  // export function useSessionsStore() {
+  const sessions = useLocalStorage("sessions", new Set<string>())
 
-export function useSessionsStore() {
-  const sessions = useLocalStorage("sessions", new Set<ISession>())
-
-  const currentSession = useLocalStorage('currentSession', <ISession>{})
+  const currentSession = useLocalStorage('currentSession', "")
 
   if (!sessions.value.size) {
     currentSession.value = addSession()
   }
 
-  function addSession(id: string = uuidv4()): ISession {
-    const s = { id }
+  function addSession(s: string = uuidv4()): string {
     sessions.value.add(s)
     return s
   }
 
-  function removeSession(session: ISession) {
-    sessions.value.delete(session)
+  function removeSession(s: string) {
+    sessions.value.delete(s)
   }
 
   return {
@@ -30,4 +26,4 @@ export function useSessionsStore() {
     removeSession,
     currentSession
   }
-}
+})

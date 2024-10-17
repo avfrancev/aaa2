@@ -28,6 +28,7 @@ export class Measurement {
     this.x2.value = x2
     this.color.value = color
     this.decoder = new Decoder(this)
+    // this.decoder = {}
   }
 
   get xScale() { return this.pulses.pulsesStore.xScale.value }
@@ -41,12 +42,20 @@ export class Measurement {
   scaledWidth = computed(() => this.scaledMaxX.value - this.scaledMinX.value)
   rangeIds = computed<[number, number]>(() => [
     this.pulses.timeBisector?.left(this.pulses.data.value, this.minX.value),
-    this.pulses.timeBisector?.left(this.pulses.data.value, this.maxX.value)
+    this.pulses.timeBisector?.center(this.pulses.data.value, this.maxX.value)
   ])
   firstPulse = computed(() => this.pulses.data.value[this.rangeIds.value[0]])
   lastPulse = computed(() => this.pulses.data.value[this.rangeIds.value[1]])
-  p2pWidth = computed(() => this.lastPulse.value.scaledTime - this.firstPulse.value.scaledTime)
+  p2pWidth = computed(() => this.lastPulse.value?.scaledTime - this.firstPulse.value?.scaledTime)
 
+  remove() {
+    this.pulses.measurements.delete(this)
+  }
+  
+  changeColor() {
+    this.color.value = getRandomNotUsedColor()
+  }
+  
   toJSON() {
     return {
       x1: toValue(this.x1),

@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 .animated {
-  @apply data-[side=bottom]:animate-slideUpAndFade data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade data-[side=top]:animate-slideDownAndFade
+  @apply data-[side=bottom]:animate-slideUpAndFade data-[side=right]:animate-slideLeftAndFade data-[side=left]:animate-slideRightAndFade data-[side=top]:animate-slideDownAndFade;
 }
 
 .PopoverContent {
-  @apply bg-base-300 rounded p-2 text-sm animated
+  @apply bg-base-300 rounded p-2 text-sm animated;
 }
 
 @keyframes fadeIn {
@@ -28,3 +28,14 @@
   }
 }
 
+@layer components {
+  .SelectContent {
+    @apply bg-base-300 rounded z-[100];
+  }
+  .SelectItem {
+    @apply cursor-pointer hover:text-primary text-sm leading-none flex items-center h-8 pr-8 relative select-none rounded-[3px] pl-[25px] data-[disabled]:pointer-events-none data-[highlighted]:outline-none
+  }
+  .SelectScrollButton {
+    @apply flex items-center justify-center bg-base-300 text-base-content cursor-default h-[25px]
+  }
+}

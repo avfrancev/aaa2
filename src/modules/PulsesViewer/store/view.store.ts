@@ -5,7 +5,7 @@ import { IView, IViewConstrains, ZoomTransform } from "~/composables/usePanZoom"
 export function createViewStore(el: MaybeComputedElementRef = ref(), ZT?: ZoomTransform): IView {
   const elBounds = useElementBounding(computed(() => toValue(el)))
   const extents = reactive<IViewConstrains>({
-    scaleConstraints: [1, 100],
+    scaleConstraints: [1, 1000],
     translateConstraints: [
       [0, 0],
       [elBounds.width, elBounds.height],
@@ -19,6 +19,26 @@ export function createViewStore(el: MaybeComputedElementRef = ref(), ZT?: ZoomTr
 export const useViewStore = createGlobalState(() => {
   let viewEl = ref()
   const view = createViewStore(viewEl)
+
+  const { currentSession } = useSessionsStore()
+  const viewStoreZTKey = computed(() => `viewStoreZT-${currentSession.value}`)
+
+  watchImmediate(currentSession, () => {
+    const ZT = window.localStorage.getItem(viewStoreZTKey.value)
+    if (ZT) {
+      const parsedZT = Object.values(JSON.parse(ZT)) as [number, number, number]
+      Object.assign(view.ZT, new ZoomTransform( ...parsedZT ))
+    } else {
+      Object.assign(view.ZT, new ZoomTransform(1,0,0))
+    }
+  })
+
+  watchDebounced(view.ZT, () => {
+    window.localStorage.setItem(viewStoreZTKey.value, JSON.stringify(view.ZT))
+  }, {
+    debounce: 500,
+  })
+  
   function init(el: MaybeComputedElementRef) {
     tryOnMounted(() => {
       viewEl.value = toValue(el)

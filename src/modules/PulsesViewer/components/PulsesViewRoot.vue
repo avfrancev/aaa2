@@ -1,18 +1,10 @@
 <template lang="pug">
 div 
-  PulsesViewSVGHelpers
   //- pre {{ ZT }} 
   //- pre >>> {{ getPulsesStore()?.data.size }}
   div
     button.btn(@click="pulsesStore?.add(sample_data[Math.floor(Math.random() * sample_data.length)])") Add sample pulses
     button.btn(@click="pulsesStore?.add(addRandom())") Add rand pulses
-    button.btn(@click="pulsesStore.saveToStorage()") saveToStorage
-  //- div( v-for="f in pulsesStore.data" :key="f.id")
-    button.btn(@click="f.xOffset.value -= 111") xOffset {{ f.xOffset }}
-    button.btn(@click="console.log(f)") log
-    //- pre {{f}}
-  //- pre {{ [...pulsesStore.data].map((d) => d.viewBox) }}
-  //- pre {{ [pulsesStore.minX] }}
   div(
     ref="viewEl"
     class="relative py-2"
@@ -51,11 +43,11 @@ div
         :width="width * ZT.k"
         height="100"
         )
-        div.absolute(
+        div(
           v-for="t in ticks"
-          class="-translate-x-1/2 text-xs"
-          :style="`left: ${(pulsesStore?.xScale.value(t) || 0 )/ width * 100}%;`"
-        ) {{ t / 1000 }}
+          class="absolute top-0 -translate-x-1/2 text-xs"
+          :style="`left: ${(pulsesStore?.xScale.value(t) || 0) / width * 100}%;`"
+          ) {{ t / 1000 }}
 </template>
 
 <script lang="ts" setup>
@@ -65,8 +57,8 @@ import type { PulsesStorage } from '../models/Pulses';
 const viewEl = ref()
 const viewStore = useViewStore()
 viewStore.init(viewEl)
-const {view } = viewStore
-const { ZT, elBounds: { width, height} } = view
+const { view } = viewStore
+const { ZT, elBounds: { width, height } } = view
 
 const pulsesStore = usePulsesStore()
 

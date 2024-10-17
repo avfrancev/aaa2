@@ -1,6 +1,9 @@
 <template lang="pug">
-div.relative
+div.relative(
+  v-hover="(s: any) => { pulses.isHovered.value = s.hovering }"
+  )
   //- pre {{ 20/view.ZT.k }}
+  //- pre {{ pulses.isHovered }}
   button.btn.btn-sm(class="hover:btn-error" @click="pulsesStore.remove(props.pulses)") X
   button.btn.btn-sm(class="hover:btn-error" @click="pulsesStore.removeAll()") remove all
   //- pre {{ props.pulses.viewBox }}
@@ -17,7 +20,8 @@ div.relative
       stroke-width="1"
       vector-effect="non-scaling-stroke"
       )
-    PulsesViewMeasurementsRects(v-bind="{ pulses: props.pulses }")
+    PulsesViewMeasurementsRects(v-bind="{ pulses }")
+    PulsesViewWidthMeasure( v-bind="{ pulses }")
     //- path(d="M0,0 L10,0 L10,10 L0,10 z")
   PulsesViewMeasurementsDecoders(v-bind="{ pulses: props.pulses }")
 </template>
@@ -40,9 +44,10 @@ import type { Pulses, PulsesItem } from "../models/Pulses";
 import type { Measurement } from "../models/Measurements";
 const pulsesStore = usePulsesStore()
 
+
 const genLine = line(
   (d: PulsesItem) => d.scaledTime,
-  (d: PulsesItem) => (d.level ? 1 : 80),
+  (d: PulsesItem) => (d.level ? 20 : 80),
 )
   .curve(curveStepAfter)
 // .curve(curveStepBefore)

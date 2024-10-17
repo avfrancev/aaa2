@@ -1,6 +1,8 @@
 <template lang="pug">
 main(class="container mx-auto px-2 min-h-svh grid")
-  PulsesViewer
+  .flex.flex-col
+    Navbar
+    PulsesViewer.flex-1
 </template>
 
 
@@ -13,9 +15,9 @@ main(class="container mx-auto px-2 min-h-svh grid")
     scroll-behavior: smooth
     height: 100%
     display: grid
-    &[data-theme='cupcake']
+    &[data-theme='light']
       background-image: url("/corrugation.png")
-    &[data-theme='dracula']
+    &[data-theme='dark']
       background-image: url("/fake-brick.png")
 
   #app

@@ -1,58 +1,52 @@
 <template lang="pug">
-div
-  //- p {{ hintsBitsFiltered.map(d => d.flatMap(g => g.bits).length) }}
+div(class="h-[20px] w-full pointer-events-none select-none")
   svg(
-    class="h-[20px] w-full text-sm font-mono"
+    @click="() => console.log(hintsBitsFiltered)"
+    class="h-[20px] w-full text-sm font-mono text-xs"
     :viewBox="`${props.pulses.viewBox.value.x} 0 ${props.pulses.viewBox.value.w} 20`"
     preserveAspectRatio="none"
+    v-if="canvasIsVisible"
     )
-    path.stroke-1.stroke-warning-content.fill-primary.opacity-50(:d="bytesRombPathes")
-    path.stroke-1.stroke-warning-content.fill-accent(:d="bitsRombPathes")
-    path.stroke-1.stroke-error(:d="ASDPATH")
+    path.stroke-2.stroke-accent(:d="groupsRangePathes")
+    path(:d="bytesRombPathes" class="stroke-1 stroke-secondary-content/70 fill-secondary/70")
+    path(:d="bitsRombPathes" class="stroke-1 stroke-secondary-content/70 fill-secondary/70")
     
     text(
-      v-for="m,i in hintsBytesFiltered"
       y="15"
       :transform="`matrix(${1 / ZT.k},0,0,1,0,0)`"
-      :key="i"
       text-anchor="middle"
       )
-      tspan.fill-warning-content(
-        v-for="d in m.flatMap(g => g.bytes)"
-        @click="console.log(m.flatMap(d => d.bytes))"
+      tspan.fill-secondary-content(
+        v-for="d,i in hintsBytesFilteredVisible"
         :x="(d.scaledX1 + d.scaledWidth / 2) * ZT.k"
+        :key="d.id + i"
         ) {{ d.label }}
     text(
-      v-for="m,i in hintsBitsFiltered"
       y="15"
       :transform="`matrix(${1 / ZT.k},0,0,1,0,0)`"
-      :key="i"
       text-anchor="middle"
       )
-      tspan.fill-warning-content(
-        v-for="d in m.flatMap(g => g.bits)"
-        @click="console.log(m.flatMap(d => d.bits))"
+      tspan.fill-secondary-content(
+        v-for="d,i in hintsBitsFiltered"
         :x="(d.scaledX1 + d.scaledWidth / 2) * ZT.k"
+        :text-length="20"
+        :key="d.id + i"
         ) {{ d.label }}
-  canvas(
-    ref="canvasEl"
-    :width="view.elBounds.width.value"
-    :height="50"
-    )
 </template>
 
 <script setup lang="ts">
-import { Decoder } from "../models/MeasurementDecoders";
 import type { PulsesItem, Pulses } from "../models/Pulses"
-import type { BitsHints, HintsGroups, IBitsHintsGroup } from "../workers/analyzer.worker";
+import type { BitsHints, Hint, HintsGroups, IBitsHintsGroup } from "../workers/analyzer.worker";
 
 const props = defineProps<{ pulses: Pulses }>()
 
 const pulsesStore = usePulsesStore()
 const { view } = useViewStore()
 const ZT = view.ZT
-const canvasEl = ref<HTMLCanvasElement | null>(null)
-const canvasIsVisible = useElementVisibility(canvasEl)
+// const  = ref<HTMLCanvasElement | null>(null)
+const canvasIsVisible = useElementVisibility(useCurrentElement())
+// console.log();
+
 
 const canvas = document.createElement("canvas")
 const context = canvas.getContext("2d") as CanvasRenderingContext2D
@@ -70,39 +64,61 @@ const hintsGroups = computed(() => {
   return arr
 })
 
-//
-// TODO: make array of filtered bytes with nested array of filtered bits
-// 
-
-const hintsBitsFiltered = computed(() => {
-  return hintsGroups.value.map(m => {
-    return m.map(g => {
-      const bits = []
-      for (let h of g.bits) {
-        if (!view.isRangeInView(h.scaledX1 + props.pulses.scaledXOffset.value, h.scaledX2 + props.pulses.scaledXOffset.value + h.scaledWidth)) continue
-        if ((Math.abs(+getTextWidth(h.label)) + 5) / ZT.k > h.scaledWidth) break
-        bits.push(h)
-      }
-      return { bits }
-    })
-  })
-})
 
 const hintsBytesFiltered = computed(() => {
-  return hintsGroups.value.map(m => {
-    return m.map(g => {
+  return hintsGroups.value.flatMap(m => {
+    return m.flatMap(g => {
       const bytes = []
       for (let h of g.bytes) {
+        const eh: (typeof h) & { bitsFiltered: Hint[] } = h as any
         if (!view.isRangeInView(h.scaledX1 + props.pulses.scaledXOffset.value, h.scaledX2 + props.pulses.scaledXOffset.value + h.scaledWidth)) continue
-        if ((Math.abs(+getTextWidth(h.label)) + 5) / ZT.k > h.scaledWidth) break
-        bytes.push(h)
+        if ((Math.abs(+getTextWidth(h.label)) + 8) / ZT.k > h.scaledWidth) break
+        // console.log(h);
+        eh.bitsFiltered = []
+        for (let bh of eh.bits) {
+          if ((Math.abs(+getTextWidth(bh.label)) + 8) / ZT.k > bh.scaledWidth) break
+          eh.bitsFiltered.push(bh)
+        }
+        bytes.push(eh)
       }
-      return { bytes }
+      return bytes
     })
   })
 })
 
-const ASDPATH = computed(() => {
+const hintsBytesFilteredVisible = computed(() => hintsBytesFiltered.value.filter(b => b.bitsFiltered.length !== b.bits.length))
+watchEffect(() => {
+  // console.log("hintsBytesFilteredVisible", hintsBytesFilteredVisible.value);
+  
+})
+
+const hintsBitsFiltered = computed(() => {
+  return hintsBytesFiltered.value.flatMap(m => {
+    // return m.flatMap(g => g.flatMap(b => b.bitsFiltered )
+    return m.bitsFiltered
+    .filter((b) => {
+      return view.isRangeInView(b.scaledX1 + props.pulses.scaledXOffset.value, b.scaledX2 + props.pulses.scaledXOffset.value + b.scaledWidth)
+      // return false
+    })
+  })
+})
+
+// const hintsBitsFiltered2 = computed(() => {
+//   return hintsBytesFiltered.value.flatMap(m => {
+//     return m.flatMap(g => g.flatMap(b => b.bitsFiltered )
+//     .filter((b) => {
+//       return view.isRangeInView(b.scaledX1 + props.pulses.scaledXOffset.value, b.scaledX2 + props.pulses.scaledXOffset.value + b.scaledWidth)
+//       // return false
+//     })
+//     )
+//   })
+// })
+
+// watchEffect(() => {
+//   console.log("hintsBitsFiltered", hintsBitsFiltered.value);
+// })
+
+const groupsRangePathes = computed(() => {
   const groups =hintsGroups.value.flatMap(m => m.map(g => g))
   let s = ""
   for (let g of groups) {
@@ -114,20 +130,22 @@ const ASDPATH = computed(() => {
 
 const bitsRombPathes = computed(() => {
   let s = ""
-  hintsBitsFiltered.value.forEach((m, i) => {
-    m.flatMap(d => d.bits).forEach((d) => {
-      s += rombPath(d.scaledX1, d.scaledWidth, 20, 5 / ZT.k)
-    })
+  // return s
+  hintsBitsFiltered.value.forEach((d, i) => {
+    s += rombPath(d.scaledX1, d.scaledWidth, 20, 5 / ZT.k)
+    // m.flatMap(d => d.bits).forEach((d) => {
+    //   s += rombPath(d.scaledX1, d.scaledWidth, 20, 5 / ZT.k)
+    // })
   })
   return s
 })
 
 const bytesRombPathes = computed(() => {
   let s = ""
-  hintsBytesFiltered.value.forEach((m, i) => {
-    m.flatMap(d => d.bytes).forEach((d) => {
-      s += rombPath(d.scaledX1, d.scaledWidth, 20, 5 / ZT.k)
-    })
+  hintsBytesFiltered.value.forEach((d, i) => {
+    // m.flatMap(d => d).forEach((d) => {
+    s += rombPath(d.scaledX1, d.scaledWidth, 20, 5 / ZT.k)
+    // })
   })
   return s
 })

@@ -15,8 +15,8 @@ const colors: Record<string, string> = reactive({
 const mode = useColorMode({
   attribute: 'data-theme',
   modes: {
-    dark: 'dark',
-    light: 'cupcake'
+    // dark: 'dark',
+    // light: 'cupcake'
   }
 })
 watch(

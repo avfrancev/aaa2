@@ -1,21 +1,63 @@
 <template lang="pug">
-div
-  pre {{ currentSession?.id }}
-  span.join.mr-2(v-for="(s, i) in sessions" :key="s.id")
-    button.btn.join-item(
-      :title="s.id"
-      :class="{ 'btn-accent': s.id === currentSession.id }"
-      @click="currentSession = s") Session \#{{ i }}
-    button.btn.join-item(
-      @click="removeSession(s)") X
-  button.btn(@click="addSession()") ADD
-  //- div
-    select(v-model="currentSession")
-      option(v-for="s in sessions" :value="s") {{ s.id }}
+SelectRoot(v-model="currentSession")
+  SelectTrigger(class="whitespace-nowrap input input-bordered h-8 inline-flex mx-4 items-center space-x-3 focus:outline-none" aria-label="Select session")
+    SelectValue(placeholder="Select session...")
+    i-radix-icons:chevron-down
+  SelectPortal
+    SelectContent(class="SelectContent" :side-offset="5")
+      SelectScrollUpButton(class="SelectScrollButton")
+        i-radix-icons:chevron-up
+      SelectViewport(class="relative p-[5px]")
+        SelectGroup(class="relative")
+          SelectItem(
+            class="SelectItem"
+            v-for="(option, index) in sessionsSorted"
+            :key="option"
+            :value="option")
+            SelectItemIndicator(class="absolute left-0 inline-flex items-center justify-center w-[25px]")
+              i-radix-icons:check
+            SelectItemText {{ option === "ESP32" ? "ESP32" : `Session #${index + 1}` }}
+          div(class="absolute top-0 right-0 mt-1s mr-1")
+            div(
+              v-for="session in sessionsSorted"
+              :key="session")
+              div(class="h-8" v-if="session === 'ESP32' && config.useESP32")
+              button(
+                class="btn btn-xs my-1 text-xs btn-square btn-ghost hover:bg-error hover:text-error-content"
+                v-else
+                @click="removeSession(session)")
+                i-ph:x
+          button(class="btn btn-xs btn-block btn-ghost" @click="currentSession = addSession()")
+            i-ph:plus(class="text-xs")
+      SelectScrollDownButton(class="SelectScrollButton") 
+        i-radix-icons:chevron-down
 </template>
 
 <script setup lang="ts">
-// const state = useState()
-const { sessions, currentSession, addSession, removeSession } = useSessionsStore()
+
+const { currentSession, sessions, addSession, removeSession: _removeSession } = useSessionsStore()
+const config = useConfig()
+
+const sessionsSorted = computed(() => {
+  if (config.useESP32)
+    return new Set(["ESP32", ...sessions.value])
+  else
+    return sessions.value
+})
+
+function removeSession(session: string) {
+  _removeSession(session)
+  nextTick(() => {
+    if (currentSession.value === session) {
+      currentSession.value = [...sessions.value][0]
+    }
+  })
+}
+
+watch(() => config.useESP32, () => {
+  if (!config.useESP32 && currentSession.value === "ESP32") {
+    currentSession.value = [...sessions.value][0]
+  }
+})
 
 </script>
