@@ -7,6 +7,16 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AlertDialogAction: typeof import('radix-vue')['AlertDialogAction']
+    AlertDialogCancel: typeof import('radix-vue')['AlertDialogCancel']
+    AlertDialogContent: typeof import('radix-vue')['AlertDialogContent']
+    AlertDialogDescription: typeof import('radix-vue')['AlertDialogDescription']
+    AlertDialogOverlay: typeof import('radix-vue')['AlertDialogOverlay']
+    AlertDialogPortal: typeof import('radix-vue')['AlertDialogPortal']
+    AlertDialogRoot: typeof import('radix-vue')['AlertDialogRoot']
+    AlertDialogTitle: typeof import('radix-vue')['AlertDialogTitle']
+    AlertDialogTrigger: typeof import('radix-vue')['AlertDialogTrigger']
+    Dialog: typeof import('./src/components/Dialog.vue')['default']
     'ICarbon:fullscreen': typeof import('~icons/carbon/fullscreen')['default']
     'ICarbon:moon': typeof import('~icons/carbon/moon')['default']
     'ICarbon:sun': typeof import('~icons/carbon/sun')['default']
@@ -15,6 +25,7 @@ declare module 'vue' {
     'IIc:roundFullscreenExit': typeof import('~icons/ic/round-fullscreen-exit')['default']
     'IMingcute:fullscreenExitFill': typeof import('~icons/mingcute/fullscreen-exit-fill')['default']
     'IMingcute:fullscreenFill': typeof import('~icons/mingcute/fullscreen-fill')['default']
+    'IPh:acorn': typeof import('~icons/ph/acorn')['default']
     'IPh:plus': typeof import('~icons/ph/plus')['default']
     'IPh:x': typeof import('~icons/ph/x')['default']
     'IRadixIcons:check': typeof import('~icons/radix-icons/check')['default']

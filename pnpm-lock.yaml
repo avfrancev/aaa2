@@ -87,6 +87,9 @@ importers:
       '@iconify-json/unjs':
         specifier: ^1.2.0
         version: 1.2.0
+      '@iconify/json':
+        specifier: ^2.2.261
+        version: 2.2.261
       '@types/d3-color':
         specifier: ^3.1.3
         version: 3.1.3
@@ -144,6 +147,9 @@ importers:
       eslint-plugin-format:
         specifier: ^0.1.2
         version: 0.1.2(eslint@9.12.0(jiti@2.3.3))
+      eslint-plugin-vue:
+        specifier: ^9.29.0
+        version: 9.29.0(eslint@9.12.0(jiti@2.3.3))
       jsdom:
         specifier: ^25.0.1
         version: 25.0.1
@@ -835,6 +841,9 @@ packages:
 
   '@iconify-json/unjs@1.2.0':
     resolution: {integrity: sha512-JrbPN+By4vzXbWWkX86UzRoHfAwotAEuDqRixmQrZnYAV6ZyIJXQZsoC5LZ1+IDGczmZvaaaWG4zeK/Wi93/bA==}
+
+  '@iconify/json@2.2.261':
+    resolution: {integrity: sha512-uUm8Svulz5aRRF0X+r2/UG5P0xcUCGOGVmAFJ/ZANx29wqE79PvGCYXHuznNC0h8+UW1fnvprj7FmgJELvMYZw==}
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -4878,6 +4887,11 @@ snapshots:
   '@iconify-json/unjs@1.2.0':
     dependencies:
       '@iconify/types': 2.0.0
+
+  '@iconify/json@2.2.261':
+    dependencies:
+      '@iconify/types': 2.0.0
+      pathe: 1.1.2
 
   '@iconify/types@2.0.0': {}
 

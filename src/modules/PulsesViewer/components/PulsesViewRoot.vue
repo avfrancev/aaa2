@@ -1,10 +1,42 @@
+<script lang="ts" setup>
+import sample_data from '~/stores/sample_data.json'
+
+const viewEl = ref()
+const viewStore = useViewStore()
+viewStore.init(viewEl)
+const { view } = viewStore
+const { ZT, elBounds: { width, height } } = view
+
+const pulsesStore = usePulsesStore()
+
+const ticksArrayString = computed<string>(() => {
+  if (!pulsesStore.xScale)
+    return ''
+  return view.ZT.rescaleX(pulsesStore.xScale.value).ticks(6).toString()
+})
+
+const ticks = computed(() => {
+  return JSON.parse(`[${ticksArrayString.value}]`) || []
+})
+
+function addRandom(l = 100, max = 1000) {
+  return {
+    raw_data: Array.from({ length: l }).map(() => Math.random() * max + 100),
+    xOffset: Math.random() * max,
+    measurements: new Set(),
+  }
+}
+</script>
+
 <template lang="pug">
-div 
-  //- pre {{ ZT }} 
+div
+  //- pre {{ ZT }}
   //- pre >>> {{ getPulsesStore()?.data.size }}
   div
     button.btn(@click="pulsesStore?.add(sample_data[Math.floor(Math.random() * sample_data.length)])") Add sample pulses
     button.btn(@click="pulsesStore?.add(addRandom())") Add rand pulses
+    button.btn.btn-sm(class="hover:btn-error" @click="pulsesStore.removeAll()") remove all
+
   div(
     ref="viewEl"
     class="relative py-2"
@@ -48,36 +80,10 @@ div
           class="absolute top-0 -translate-x-1/2 text-xs"
           :style="`left: ${(pulsesStore?.xScale.value(t) || 0) / width * 100}%;`"
           ) {{ t / 1000 }}
+        div(
+          :style="`transform: translate3d(${view.mouseX.value * ZT.k}px, 0, 0)`"
+          class="absolute top-0 text-xs")
+          div(
+            class="-translate-x-1/2 bg-base-300 text-base-content rounded py-1 px-1.5"
+          ) {{ pulsesStore?.xScale.value.invert(view.mouseX.value).toFixed(0) }}
 </template>
-
-<script lang="ts" setup>
-import sample_data from '~/stores/sample_data.json'
-import type { PulsesStorage } from '../models/Pulses';
-
-const viewEl = ref()
-const viewStore = useViewStore()
-viewStore.init(viewEl)
-const { view } = viewStore
-const { ZT, elBounds: { width, height } } = view
-
-const pulsesStore = usePulsesStore()
-
-
-const ticksArrayString = computed<string>(() => {
-  if (!pulsesStore.xScale) return ''
-  return view.ZT.rescaleX(pulsesStore.xScale.value).ticks(6).toString()
-})
-
-const ticks = computed(() => {
-  return JSON.parse(`[${ticksArrayString.value}]`) || []
-})
-
-function addRandom(l = 100, max = 1000) {
-  return <PulsesStorage>{
-    raw_data: Array.from({ length: l }).map(() => Math.random() * max + 100),
-    xOffset: Math.random() * max,
-    measurements: new Set(),
-  }
-}
-
-</script>
