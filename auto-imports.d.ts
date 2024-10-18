@@ -62,6 +62,7 @@ declare global {
   const mapToObject: typeof import('./src/utils')['mapToObject']
   const mapValuesToArray: typeof import('./src/utils')['mapValuesToArray']
   const markRaw: typeof import('vue')['markRaw']
+  const measureText: typeof import('./src/utils')['measureText']
   const nextTick: typeof import('vue')['nextTick']
   const onActivated: typeof import('vue')['onActivated']
   const onBeforeMount: typeof import('vue')['onBeforeMount']
@@ -370,6 +371,7 @@ declare module 'vue' {
     readonly isRef: UnwrapRef<typeof import('vue')['isRef']>
     readonly makeDestructurable: UnwrapRef<typeof import('@vueuse/core')['makeDestructurable']>
     readonly markRaw: UnwrapRef<typeof import('vue')['markRaw']>
+    readonly measureText: UnwrapRef<typeof import('./src/utils')['measureText']>
     readonly nextTick: UnwrapRef<typeof import('vue')['nextTick']>
     readonly onActivated: UnwrapRef<typeof import('vue')['onActivated']>
     readonly onBeforeMount: UnwrapRef<typeof import('vue')['onBeforeMount']>

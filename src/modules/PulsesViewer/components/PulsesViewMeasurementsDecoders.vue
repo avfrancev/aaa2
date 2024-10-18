@@ -5,7 +5,7 @@ div(class="h-[20px] w-full pointer-events-none select-none")
     class="h-[20px] w-full text-sm font-mono text-xs"
     :viewBox="`${props.pulses.viewBox.value.x} 0 ${props.pulses.viewBox.value.w} 20`"
     preserveAspectRatio="none"
-    v-if="canvasIsVisible"
+    v-if="isRootVisible"
     )
     path.stroke-2.stroke-accent(:d="groupsRangePathes")
     path(:d="bytesRombPathes" class="stroke-1 stroke-secondary-content/70 fill-secondary/70")
@@ -44,17 +44,8 @@ const pulsesStore = usePulsesStore()
 const { view } = useViewStore()
 const ZT = view.ZT
 // const  = ref<HTMLCanvasElement | null>(null)
-const canvasIsVisible = useElementVisibility(useCurrentElement())
+const isRootVisible = useElementVisibility(useCurrentElement())
 // console.log();
-
-
-const canvas = document.createElement("canvas")
-const context = canvas.getContext("2d") as CanvasRenderingContext2D
-context.font = "0.875rem monospace"
-
-function getTextWidth(s = "") {
-  return context.measureText(s).width;
-}
 
 const hintsGroups = computed(() => {
   let arr = [] as HintsGroups[]
@@ -72,11 +63,11 @@ const hintsBytesFiltered = computed(() => {
       for (let h of g.bytes) {
         const eh: (typeof h) & { bitsFiltered: Hint[] } = h as any
         if (!view.isRangeInView(h.scaledX1 + props.pulses.scaledXOffset.value, h.scaledX2 + props.pulses.scaledXOffset.value + h.scaledWidth)) continue
-        if ((Math.abs(+getTextWidth(h.label)) + 8) / ZT.k > h.scaledWidth) break
+        if ((Math.abs(+measureText(h.label)) + 8) / ZT.k > h.scaledWidth) break
         // console.log(h);
         eh.bitsFiltered = []
         for (let bh of eh.bits) {
-          if ((Math.abs(+getTextWidth(bh.label)) + 8) / ZT.k > bh.scaledWidth) break
+          if ((Math.abs(+measureText(bh.label)) + 8) / ZT.k > bh.scaledWidth) break
           eh.bitsFiltered.push(bh)
         }
         bytes.push(eh)

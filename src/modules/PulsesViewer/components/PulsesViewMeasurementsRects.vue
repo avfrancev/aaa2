@@ -23,7 +23,7 @@ svg(
   g
     path(
       stroke-width="0"
-      :fill="m.isHovered.value ? m.color.value + '20' : m.color.value + '10'"
+      :fill="m.isHovered.value ? m.color.value + '30' : m.color.value + '20'"
       :d="`M${0},${top} L${m.scaledWidth.value},${top} L${m.scaledWidth.value},${bottom} L${0},${bottom} z`"
       )
     path(
@@ -56,7 +56,7 @@ svg(
       vector-effect="non-scaling-stroke"
       :d="`M${m.x1.value < m.x2.value ? m.scaledWidth.value : 0},${top} V${bottom}`"
       v-drag="resizeHandleHandler.bind(null, m, 'x2')")
-
+  
 </template>
 
 <script setup lang="ts">

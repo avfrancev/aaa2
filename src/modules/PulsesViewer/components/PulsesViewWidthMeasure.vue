@@ -1,5 +1,5 @@
 <template lang="pug">
-g(v-if="pulses.isHovered.value" class="pointer-events-none select-none")
+g(v-if="pulses.isHovered.value && (metaData.l1.w > 10 / view.ZT.k) && (metaData.l2 && metaData.l2.w > 10 / view.ZT.k)" class="pointer-events-none select-none")
   path.stroke-1.stroke-base-content(:d="`M${metaData.l1.x1},${top} H${metaData.l1.x2}`")
   path.stroke-1.stroke-base-content(
     v-if="metaData.l2"
@@ -22,9 +22,8 @@ g(v-if="pulses.isHovered.value" class="pointer-events-none select-none")
     text-anchor="middle"
     )
     tspan(
-      ref="text1Ref"
       :x="metaData.l1.labelPos * view.ZT.k"
-      :y="top-2"
+      :y="top - 2"
       ) {{ metaData.l1.label }}
     tspan(
       v-if="metaData.l2"
@@ -49,15 +48,13 @@ const pulsesUnderCursor = computed(() => {
   return pulses.data.value.slice(pulseIDUnderCursor.value, pulseIDUnderCursor.value + 2)
 })
 
-const text1Ref = ref<SVGTextElement>()
-const text1Bounds = useElementBounding(text1Ref)
-// const text1Ref = ref<SVGTextElement>()
 
-function viewPortConstraints(x: number) {
+function viewPortConstraints(x: number, text: string, padding = 10) {
   const viewportLeft = (view.viewportLeft.value - pulses.scaledXOffset.value) 
   const viewportRight = (view.viewportRight.value - pulses.scaledXOffset.value) 
-  const halfWidth = (text1Bounds.width.value / 2) / view.ZT.k
-  const padding = 10 / view.ZT.k
+  // const halfWidth = (text1Bounds.width.value / 2) / view.ZT.k
+  const halfWidth = (measureText(`${text}`) / 2) / view.ZT.k
+  padding /= view.ZT.k
   if (x < viewportLeft + halfWidth + padding)
     x = viewportLeft + halfWidth + padding
   else if (x > viewportRight - halfWidth - padding)
@@ -67,23 +64,23 @@ function viewPortConstraints(x: number) {
 
 const metaData = computed(() => {
   const p = pulsesUnderCursor.value
+
+  const label1 = p[0]?.width.toFixed(0) || ""
   const l1 = {
     x1: p[0]?.scaledTime || 0,
     x2: (p[0]?.scaledTime + p[0]?.scaledWidth) || 0,
     w: p[0]?.scaledWidth || 0,
-    label: p[0]?.width || "",
-    labelPos: viewPortConstraints(p[0]?.scaledTime + p[0]?.scaledWidth / 2),
+    label: label1,
+    labelPos: viewPortConstraints(p[0]?.scaledTime + p[0]?.scaledWidth / 2, label1),
   }
-  // l1.labelPos = (l1.x1 + l1.w / 2) 
-  // console.log(l1.labelPos / view.ZT.k, view.viewportLeft.value);
   
-  
+  const label2 = (p[0]?.width + p[1]?.width).toFixed(0) || ""
   const l2 = p.length === 1 ? null : {
     x1: p[0]?.scaledTime || 0,
     x2: (p[1]?.scaledTime + p[1]?.scaledWidth) || 0,
     w: (p[0]?.scaledWidth + p[1]?.scaledWidth) || 0,
-    label: (p[0]?.width + p[1]?.width) || "",
-    labelPos: viewPortConstraints(p[0]?.scaledTime + (p[0]?.scaledWidth + p[1]?.scaledWidth) / 2),
+    label: label2,
+    labelPos: viewPortConstraints(p[0]?.scaledTime + (p[0]?.scaledWidth + p[1]?.scaledWidth) / 2, label2),
   }
   return { l1, l2 }
 })
