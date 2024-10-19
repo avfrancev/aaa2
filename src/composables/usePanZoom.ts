@@ -1,10 +1,9 @@
-import { useGesture } from "@vueuse/gesture"
+import { useGesture } from '@vueuse/gesture'
 // import { animate, easeInOut, inertia } from "popmotion"
 
-import type { MaybeComputedElementRef, UseElementBoundingReturn } from "@vueuse/core"
-import type { State } from "@vueuse/gesture"
-import { MaybeRef, ShallowReactive } from "vue"
-
+import type { MaybeComputedElementRef, UseElementBoundingReturn } from '@vueuse/core'
+import type { State } from '@vueuse/gesture'
+import type { MaybeRef, ShallowReactive } from 'vue'
 
 export class ZoomTransform {
   k: number
@@ -57,7 +56,7 @@ export class ZoomTransform {
   }
 
   toString() {
-    return "translate(" + this.x + "," + this.y + ") scale(" + this.k + ")"
+    return `translate(${this.x},${this.y}) scale(${this.k})`
   }
 }
 
@@ -100,7 +99,8 @@ function getGestures(view: IView) {
         view.mouseX.value = view.ZT.invertX(s.event.clientX - view.elBounds.left.value)
       },
       onWheel: (s) => {
-        if (s.direction[1]) return
+        if (s.direction[1])
+          return
         s.event.preventDefault()
         view.translateBy(s.delta[0], 0)
         nextTick(() => {
@@ -119,12 +119,10 @@ function getGestures(view: IView) {
           s.event.preventDefault()
           // gestures.state.wheel.cancel()
           const scaleFactor = Math.exp(s.delta[1] * -0.001)
-          // @ts-ignore
-          // window.requestAnimationFrame(() => {
-          // })
-          let x = s.event.clientX - toValue(view.elBounds.left.value)
+          const e = s.event as (typeof s.event & { clientX: number })
+          const x = e.clientX - toValue(view.elBounds.left.value)
           view.scaleToPointX(scaleFactor, x)
-          view.mouseX.value = view.ZT.invertX(s.event.clientX - view.elBounds.left.value)
+          view.mouseX.value = view.ZT.invertX(e.clientX - view.elBounds.left.value)
         }
       },
     },
@@ -147,12 +145,11 @@ function getGestures(view: IView) {
   return gestures
 }
 
-
 export function createView(el: MaybeComputedElementRef, elBounds: UseElementBoundingReturn, extents: IViewConstrains, ZT?: ShallowReactive<ZoomTransform>): IView {
   const state = shallowReactive({
-    el: el,
-    elBounds: elBounds,
-    extents: extents,
+    el,
+    elBounds,
+    extents,
     ZT: ZT || shallowReactive(new ZoomTransform(1, 0, 0)),
     mouseX: ref(0),
   } as IView)
@@ -184,12 +181,12 @@ export function createView(el: MaybeComputedElementRef, elBounds: UseElementBoun
     },
     isRangeInView(x1: number, x2: number) {
       return state.viewportLeft.value < x2 && x1 < state.viewportRight.value
-    }
+    },
   }
 
   const actions = {
     getScaleToPointX(scaleFactor: number, p0: number) {
-      let p1 = state.ZT.invertX(p0)
+      const p1 = state.ZT.invertX(p0)
       let newZT = toRaw(state.ZT.scale(scaleFactor))
       const scaleConstraints = unwrapedConstraints.value.scaleConstraints
       newZT.k = Math.max(scaleConstraints[0], Math.min(scaleConstraints[1], newZT.k))
@@ -203,19 +200,19 @@ export function createView(el: MaybeComputedElementRef, elBounds: UseElementBoun
       Object.assign(state.ZT, actions.constrain(state.ZT))
     },
     scaleToPointX(scaleFactor: number, p0: number) {
-      let newZT = actions.getScaleToPointX(scaleFactor, p0)
+      const newZT = actions.getScaleToPointX(scaleFactor, p0)
       Object.assign(state.ZT, newZT)
       // debugger
     },
     constrain(ZT: ZoomTransform) {
-      let unwraped = unwrapedConstraints.value.translateConstraints
+      const unwraped = unwrapedConstraints.value.translateConstraints
       return actions.defaultConstrain(ZT, unwraped, unwraped)
     },
     defaultConstrain(transform: ZoomTransform, extent: Array<[number, number]>, translateExtent: Array<[number, number]>) {
-      var dx0 = transform.invertX(extent[0][0]) - translateExtent[0][0],
-        dx1 = transform.invertX(extent[1][0]) - translateExtent[1][0],
-        dy0 = transform.invertY(extent[0][1]) - translateExtent[0][1],
-        dy1 = transform.invertY(extent[1][1]) - translateExtent[1][1]
+      const dx0 = transform.invertX(extent[0][0]) - translateExtent[0][0]
+      const dx1 = transform.invertX(extent[1][0]) - translateExtent[1][0]
+      const dy0 = transform.invertY(extent[0][1]) - translateExtent[0][1]
+      const dy1 = transform.invertY(extent[1][1]) - translateExtent[1][1]
       return transform.translate(
         dx1 > dx0 ? (dx0 + dx1) / 2 : Math.min(0, dx0) || Math.max(0, dx1),
         dy1 > dy0 ? (dy0 + dy1) / 2 : Math.min(0, dy0) || Math.max(0, dy1),

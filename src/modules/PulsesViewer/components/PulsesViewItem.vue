@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import type { Measurement } from '../models/Measurements'
 import type { Pulses, PulsesItem } from '../models/Pulses'
-import { curveMonotoneX, curveStepAfter, curveStepBefore, line } from 'd3-shape'
+import { curveStepAfter, line } from 'd3-shape'
 
 const props = defineProps<{ pulses: Pulses }>()
 
-// const asd = 123
-
-// import { getCurrentViewStore} from '../stores/view.store';
-// const viewStore = getCurrentViewStore()
-
 const { view } = useViewStore()
 const { ZT } = view
+
 const pulsesStore = usePulsesStore()
 
 const genLine = line(
@@ -29,7 +25,8 @@ let tmpMeasurement: Measurement | null = null
 function onItemDrag(s: any) {
   if (s.altKey) {
     s.event.stopImmediatePropagation()
-    props.pulses.xOffset.value += (pulsesStore.pixelRatio.value * s.delta[0]) / ZT.k
+    // props.pulses.xOffset.value += (pulsesStore.pixelRatio.value * s.delta[0]) / ZT.k
+    props.pulses.setXOffset(props.pulses.xOffset.value + (pulsesStore.pixelRatio.value * s.delta[0]) / ZT.k)
   }
   else if (s.shiftKey) {
     s.event.stopImmediatePropagation()
@@ -54,7 +51,7 @@ function onItemDrag(s: any) {
 
 <template lang="pug">
 div.relative(
-  v-hover="(s: any) => { pulses.isHovered.value = s.hovering }"
+  v-hover="(s: any) => { pulses.setIsHovered(s.hovering) }"
   )
   //- pre {{ 20/view.ZT.k }}
   //- pre {{ pulses.isHovered }}
@@ -64,20 +61,20 @@ div.relative(
       AlertDialogRoot
         AlertDialogTrigger
           button.btn.btn-sm(class="hover:btn-error")
-          i-ph:acorn
+            i-ph:airplay-light
         AlertDialogPortal
           AlertDialogOverlay(class="AlertDialogOverlay")
           AlertDialogContent(class="AlertDialogContent")
-            AlertDialogTitle ALKSDJALSD
-            AlertDialogDescription askjdashfkjsa
+            AlertDialogTitle.text-xl.my-3 Delete pulses
+            AlertDialogDescription Really delete pulses?
             div(class="flex justify-end gap-[25px]")
               AlertDialogCancel(class="btn btn-sm btn-ghost") Cancel
-              AlertDialogAction(class="btn btn-sm btn-primary" @click="pulsesStore.remove(props.pulses)") Delete
+              AlertDialogAction(class="btn btn-sm btn-error" @click="pulsesStore.remove(props.pulses)") Delete
 
   //- pre {{ props.pulses.viewBox }}
   svg.w-full(
-    class="h-[100px]"
     v-drag="onItemDrag"
+    class="h-[100px]"
     :viewBox="`${props.pulses.viewBox.value.x} 0 ${props.pulses.viewBox.value.w} 100`"
     preserveAspectRatio="none"
     )

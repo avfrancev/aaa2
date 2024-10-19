@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import sample_data from '~/stores/sample_data.json'
+import type { PulsesStorage } from '../models/Pulses'
+import sample_data from '../store/sample_data.json'
 
 const viewEl = ref()
 const viewStore = useViewStore()
@@ -24,7 +25,7 @@ function addRandom(l = 100, max = 1000) {
     raw_data: Array.from({ length: l }).map(() => Math.random() * max + 100),
     xOffset: Math.random() * max,
     measurements: new Set(),
-  }
+  } as unknown as PulsesStorage
 }
 </script>
 
@@ -68,7 +69,7 @@ div
         class="stroke-base-content/20"
         stroke-dasharray="8 10"
         stroke-width="1"
-        :d="ticks.reduce((acc: string, t: number) => acc + `M ${pulsesStore?.xScale.value(t)},0 V${height} `, '')"
+        :d="ticks.reduce((acc: string, t: number) => `${acc}M ${pulsesStore?.xScale.value(t)},0 V${height} `, '')"
         )
       foreignObject.pointer-events-nones(
         :transform="`matrix(${1 / ZT.k},0,0,1,${0},0)`"
@@ -77,6 +78,7 @@ div
         )
         div(
           v-for="t in ticks"
+          :key="t"
           class="absolute top-0 -translate-x-1/2 text-xs"
           :style="`left: ${(pulsesStore?.xScale.value(t) || 0) / width * 100}%;`"
           ) {{ t / 1000 }}

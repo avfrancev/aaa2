@@ -3,7 +3,6 @@
 // import { IView, ZoomTransform } from "~/composables/usePanZoom";
 // import { Pulses, PulsesStorage } from "../models/Pulses";
 
-
 // export function getPulsesStore() {
 //   return toValue(useState().pulsesStore)
 // }
@@ -13,7 +12,7 @@
 
 //     const viewEl = ref()
 //     console.log(123123123);
-    
+
 //     let view = createViewStore(viewEl)
 
 //     const sessionsStore = useSessionsStore()
@@ -38,7 +37,6 @@
 //       // Object.assign(pulsesStore, pulsesStores.get(sessionsStore.currentSession.value.id))
 //     })
 
-
 //     function init(el: MaybeComputedElementRef) {
 //       pulsesStores.clear()
 //       sessionsStore.sessions.value.forEach(s => {
@@ -61,15 +59,11 @@
 //     //   init,
 //     // })
 
-
-
 //     // return state
 
 //     return { sessionsStore, view, pulsesStores, pulsesStore, init, state }
 //   }
 // )
-
-
 
 // function makePS(key: string) {
 //   const state = shallowReactive({
@@ -78,12 +72,11 @@
 //   })
 
 //   const storage = useStorage(`pulsesStore-${key}`, <PulsesStorage[] | null>[])
-  
+
 //   const getters = {}
 //   const actions = {}
 //   return Object.assign(state, getters, actions)
 // }
-
 
 // const sss = useSSS()
 // sss.init()

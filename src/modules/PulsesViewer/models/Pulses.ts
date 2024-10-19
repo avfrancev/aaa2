@@ -1,13 +1,13 @@
-import { MaybeRef, ShallowReactive } from "vue"
-import { Measurement, MeasurementStorage } from "./Measurements"
-import { v4 as uuidv4 } from "uuid"
-import { Bisector, bisector, extent, sum } from "d3-array"
+import type { MeasurementStorage } from './Measurements'
+import { bisector, extent, sum } from 'd3-array'
+import { v4 as uuidv4 } from 'uuid'
+import { Measurement } from './Measurements'
 // import { pick } from "~/utils"
-import { PulsesStore } from "../store/pulses.store"
+import type { PulsesStore } from '../store/pulses.store'
 // import { PulsesStore } from "../store"
 // import { currentPulsesStore } from "../stores/pulses.store"
 
-export type PulsesItem = {
+export interface PulsesItem {
   level: number
   time: number
   width: number
@@ -16,7 +16,6 @@ export type PulsesItem = {
 }
 
 export type PulsesStorage = ReturnType<Pulses['toJSON']>
-
 
 export class Pulses {
   id = uuidv4()
@@ -51,15 +50,18 @@ export class Pulses {
   // get minPulseWidth() { return this.pulsesWidthExtent.value[0] }
   // get maxPulseWidth() { return this.pulsesWidthExtent.value[1] }
   data = computed<PulsesItem[]>(() => {
-    let startLevel = 0
-    if (this.raw_data[this.raw_data.length - 1] !== 0) this.raw_data.push(0)
+    const startLevel = 0
+    if (this.raw_data[this.raw_data.length - 1] !== 0)
+      this.raw_data.push(0)
     let time = 0
     return this.raw_data.map((d, i) => {
-      if (i !== 0) time += this.raw_data[i - 1]
+      if (i !== 0)
+        time += this.raw_data[i - 1]
       // return { level: (i + startLevel) % 2, width: d, time, scaledTime: this.pulsesStore.xScale.value(time) || 0, scaledWidth: this.pulsesStore.xScale.value(d) || 0 }
       return { level: (i + startLevel) % 2, width: d, time, scaledTime: this.xScale.value(time) || 0, scaledWidth: this.xScale.value(d + this.pulsesStore.minX.value) || 0 }
     })
   })
+
   get view() { return this.pulsesStore.view }
   viewBox = computed<{ x: number, w: number }>(() => {
     // let xOffset = computed(() => pulsesStore.active.xScale(state.xOffset + pulsesStore.active.minX))
@@ -70,7 +72,15 @@ export class Pulses {
   })
 
   remove() {
-    console.warn("Not impllemented")
+    console.warn('Not impllemented')
+  }
+
+  setIsHovered(hovering: boolean) {
+    this.isHovered.value = hovering
+  }
+
+  setXOffset(x: number) {
+    this.xOffset.value = x
   }
 
   addMeasurement(x1: number, x2: number, color?: string) {
@@ -78,7 +88,7 @@ export class Pulses {
     this.measurements.add(m)
     return m
   }
-  
+
   toJSON() {
     return {
       raw_data: this.raw_data,
@@ -87,5 +97,4 @@ export class Pulses {
       measurements: Array.from(this.measurements as unknown as MeasurementStorage[]),
     }
   }
-
 }

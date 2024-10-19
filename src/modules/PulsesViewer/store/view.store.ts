@@ -1,6 +1,6 @@
-import { MaybeComputedElementRef } from "@vueuse/core"
-import { IView, IViewConstrains, ZoomTransform } from "~/composables/usePanZoom"
-
+import type { MaybeComputedElementRef } from '@vueuse/core'
+import type { IView, IViewConstrains } from '~/composables/usePanZoom'
+import { ZoomTransform } from '~/composables/usePanZoom'
 
 export function createViewStore(el: MaybeComputedElementRef = ref(), ZT?: ZoomTransform): IView {
   const elBounds = useElementBounding(computed(() => toValue(el)))
@@ -15,9 +15,8 @@ export function createViewStore(el: MaybeComputedElementRef = ref(), ZT?: ZoomTr
   return view as IView
 }
 
-
 export const useViewStore = createGlobalState(() => {
-  let viewEl = ref()
+  const viewEl = ref()
   const view = createViewStore(viewEl)
 
   const { currentSession } = useSessionsStore()
@@ -27,9 +26,10 @@ export const useViewStore = createGlobalState(() => {
     const ZT = window.localStorage.getItem(viewStoreZTKey.value)
     if (ZT) {
       const parsedZT = Object.values(JSON.parse(ZT)) as [number, number, number]
-      Object.assign(view.ZT, new ZoomTransform( ...parsedZT ))
-    } else {
-      Object.assign(view.ZT, new ZoomTransform(1,0,0))
+      Object.assign(view.ZT, new ZoomTransform(...parsedZT))
+    }
+    else {
+      Object.assign(view.ZT, new ZoomTransform(1, 0, 0))
     }
   })
 
@@ -38,7 +38,7 @@ export const useViewStore = createGlobalState(() => {
   }, {
     debounce: 500,
   })
-  
+
   function init(el: MaybeComputedElementRef) {
     tryOnMounted(() => {
       viewEl.value = toValue(el)

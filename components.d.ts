@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AAA: typeof import('./src/components/AAA.vue')['default']
     AlertDialogAction: typeof import('radix-vue')['AlertDialogAction']
     AlertDialogCancel: typeof import('radix-vue')['AlertDialogCancel']
     AlertDialogContent: typeof import('radix-vue')['AlertDialogContent']
@@ -26,6 +27,7 @@ declare module 'vue' {
     'IMingcute:fullscreenExitFill': typeof import('~icons/mingcute/fullscreen-exit-fill')['default']
     'IMingcute:fullscreenFill': typeof import('~icons/mingcute/fullscreen-fill')['default']
     'IPh:acorn': typeof import('~icons/ph/acorn')['default']
+    'IPh:airplayLight': typeof import('~icons/ph/airplay-light')['default']
     'IPh:plus': typeof import('~icons/ph/plus')['default']
     'IPh:x': typeof import('~icons/ph/x')['default']
     'IRadixIcons:check': typeof import('~icons/radix-icons/check')['default']
