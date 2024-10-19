@@ -1,3 +1,41 @@
+<script setup lang="ts">
+import type { GestureState } from '@vueuse/gesture'
+
+import type { Measurement } from '../models/Measurements'
+import type { Pulses, PulsesItem } from '../models/Pulses'
+import { bisector, sum } from 'd3-array'
+
+const { pulses, top = 1, bottom = 98 } = defineProps<{ pulses: Pulses, top?: number, bottom?: number }>()
+
+const pulsesStore = usePulsesStore()
+const { view } = useViewStore()
+const ZT = view.ZT
+
+function dragHandler(m: Measurement) {
+  return function (s: GestureState<'drag'>) {
+    if (m.isSelected.value) {
+      s.event?.stopImmediatePropagation()
+      const dx = (pulsesStore.pixelRatio.value * s.delta[0]) / ZT.k
+      m.x1.value += dx
+      m.x2.value += dx
+    }
+  }
+}
+
+const bisectPulses = bisector((d: PulsesItem) => d.scaledTime).center
+
+function resizeHandleHandler(m: Measurement, key: 'x1' | 'x2', s: any) {
+  s.event.stopImmediatePropagation()
+  let x = (s.event.clientX - view.elBounds.left.value)
+  x = ZT.invertX(x)
+  x -= pulses.scaledXOffset.value
+  const id = bisectPulses(pulses.data.value, x)
+  const { time, scaledTime } = pulses.data.value[id]
+  const cond = Math.abs(scaledTime - x) * ZT.k < 7
+  m[key].value = (cond && s.altKey) ? time : pulsesStore.xScale.value.invert(x)
+}
+</script>
+
 <template lang="pug">
 svg(
   class="measurement-rect focus:outline-none pointer-events-auto overflow-visible"
@@ -56,47 +94,4 @@ svg(
       vector-effect="non-scaling-stroke"
       :d="`M${m.x1.value < m.x2.value ? m.scaledWidth.value : 0},${top} V${bottom}`"
       v-drag="resizeHandleHandler.bind(null, m, 'x2')")
-  
 </template>
-
-<script setup lang="ts">
-import { bisector, sum } from 'd3-array'
-
-import type { Measurement } from '../models/Measurements';
-import type { PulsesItem, Pulses } from "../models/Pulses"
-import type { GestureState } from '@vueuse/gesture';
-
-const { pulses, top = 1, bottom = 98 } = defineProps<{ pulses: Pulses, top?: number, bottom?: number }>()
-
-const pulsesStore = usePulsesStore()
-const { view } = useViewStore()
-const ZT = view.ZT
-
-
-function dragHandler(m: Measurement) {
-  return function (s: GestureState<'drag'>) {
-    if (m.isSelected.value) {
-      s.event?.stopImmediatePropagation()
-      let dx = (pulsesStore.pixelRatio.value * s.delta[0]) / ZT.k
-      m.x1.value += dx
-      m.x2.value += dx
-    }
-  }
-}
-
-const bisectPulses = bisector((d: PulsesItem) => d.scaledTime).center
-
-const resizeHandleHandler = (m: Measurement, key: 'x1' | 'x2', s: any) => {
-  s.event.stopImmediatePropagation()
-  let x = (s.event.clientX - view.elBounds.left.value)
-  x = ZT.invertX(x)
-  x -= pulses.scaledXOffset.value
-  let id = bisectPulses(pulses.data.value, x)
-  let { time, scaledTime } = pulses.data.value[id]
-  let cond = Math.abs(scaledTime - x) * ZT.k < 7
-  m[key].value = (cond && s.altKey) ? time : pulsesStore.xScale.value.invert(x)
-}
-
-
-
-</script>

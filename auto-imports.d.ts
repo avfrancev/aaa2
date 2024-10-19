@@ -7,6 +7,7 @@
 export {}
 declare global {
   const Decoder: typeof import('./src/modules/PulsesViewer/models/MeasurementDecoders')['Decoder']
+  const ESP32: typeof import('./src/stores/ESP32')['default']
   const EffectScope: typeof import('vue')['EffectScope']
   const Measurement: typeof import('./src/modules/PulsesViewer/models/Measurements')['Measurement']
   const Pulses: typeof import('./src/modules/PulsesViewer/models/Pulses')['Pulses']
@@ -14,12 +15,13 @@ declare global {
   const ZoomTransform: typeof import('./src/composables/usePanZoom')['ZoomTransform']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
+  const colors: typeof import('./src/stores/colors')['colors']
   const computed: typeof import('vue')['computed']
   const computedAsync: typeof import('@vueuse/core')['computedAsync']
   const computedEager: typeof import('@vueuse/core')['computedEager']
   const computedInject: typeof import('@vueuse/core')['computedInject']
   const computedWithControl: typeof import('@vueuse/core')['computedWithControl']
-  const config: typeof import('./src/modules/PulsesViewer/store/config')['default']
+  const config: typeof import('./src/stores/config')['default']
   const controlledComputed: typeof import('@vueuse/core')['controlledComputed']
   const controlledRef: typeof import('@vueuse/core')['controlledRef']
   const createApp: typeof import('vue')['createApp']
@@ -38,6 +40,7 @@ declare global {
   const createView: typeof import('./src/composables/usePanZoom')['createView']
   const createViewStore: typeof import('./src/modules/PulsesViewer/store/view.store')['createViewStore']
   const customRef: typeof import('vue')['customRef']
+  const darkColors: typeof import('./src/stores/colors')['darkColors']
   const debouncedRef: typeof import('@vueuse/core')['debouncedRef']
   const debouncedWatch: typeof import('@vueuse/core')['debouncedWatch']
   const defineAsyncComponent: typeof import('vue')['defineAsyncComponent']
@@ -45,8 +48,10 @@ declare global {
   const eagerComputed: typeof import('@vueuse/core')['eagerComputed']
   const effectScope: typeof import('vue')['effectScope']
   const extendRef: typeof import('@vueuse/core')['extendRef']
+  const getColor: typeof import('./src/stores/colors')['getColor']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
+  const getRandomNotUsedColor: typeof import('./src/stores/colors')['getRandomNotUsedColor']
   const h: typeof import('vue')['h']
   const ignorableWatch: typeof import('@vueuse/core')['ignorableWatch']
   const inject: typeof import('vue')['inject']
@@ -57,12 +62,14 @@ declare global {
   const isReactive: typeof import('vue')['isReactive']
   const isReadonly: typeof import('vue')['isReadonly']
   const isRef: typeof import('vue')['isRef']
+  const lightColors: typeof import('./src/stores/colors')['lightColors']
   const makeDestructurable: typeof import('@vueuse/core')['makeDestructurable']
   const makeSeparatedStore: typeof import('./src/utils')['makeSeparatedStore']
   const mapToObject: typeof import('./src/utils')['mapToObject']
   const mapValuesToArray: typeof import('./src/utils')['mapValuesToArray']
   const markRaw: typeof import('vue')['markRaw']
   const measureText: typeof import('./src/utils')['measureText']
+  const mode: typeof import('./src/stores/colors')['mode']
   const nextTick: typeof import('vue')['nextTick']
   const onActivated: typeof import('vue')['onActivated']
   const onBeforeMount: typeof import('vue')['onBeforeMount']
@@ -88,6 +95,7 @@ declare global {
   const pick: typeof import('./src/utils')['pick']
   const provide: typeof import('vue')['provide']
   const provideLocal: typeof import('@vueuse/core')['provideLocal']
+  const rainbowColors: typeof import('./src/stores/colors')['rainbowColors']
   const reactify: typeof import('@vueuse/core')['reactify']
   const reactifyObject: typeof import('@vueuse/core')['reactifyObject']
   const reactive: typeof import('vue')['reactive']
@@ -324,6 +332,7 @@ declare module 'vue' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly Decoder: UnwrapRef<typeof import('./src/modules/PulsesViewer/models/MeasurementDecoders')['Decoder']>
+    readonly ESP32: UnwrapRef<typeof import('./src/stores/ESP32')['default']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly Measurement: UnwrapRef<typeof import('./src/modules/PulsesViewer/models/Measurements')['Measurement']>
     readonly Pulses: UnwrapRef<typeof import('./src/modules/PulsesViewer/models/Pulses')['Pulses']>
@@ -331,11 +340,13 @@ declare module 'vue' {
     readonly ZoomTransform: UnwrapRef<typeof import('./src/composables/usePanZoom')['ZoomTransform']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('@vueuse/core')['autoResetRef']>
+    readonly colors: UnwrapRef<typeof import('./src/stores/colors')['colors']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly computedAsync: UnwrapRef<typeof import('@vueuse/core')['computedAsync']>
     readonly computedEager: UnwrapRef<typeof import('@vueuse/core')['computedEager']>
     readonly computedInject: UnwrapRef<typeof import('@vueuse/core')['computedInject']>
     readonly computedWithControl: UnwrapRef<typeof import('@vueuse/core')['computedWithControl']>
+    readonly config: UnwrapRef<typeof import('./src/stores/config')['default']>
     readonly controlledComputed: UnwrapRef<typeof import('@vueuse/core')['controlledComputed']>
     readonly controlledRef: UnwrapRef<typeof import('@vueuse/core')['controlledRef']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
@@ -350,6 +361,7 @@ declare module 'vue' {
     readonly createView: UnwrapRef<typeof import('./src/composables/usePanZoom')['createView']>
     readonly createViewStore: UnwrapRef<typeof import('./src/modules/PulsesViewer/store/view.store')['createViewStore']>
     readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
+    readonly darkColors: UnwrapRef<typeof import('./src/stores/colors')['darkColors']>
     readonly debouncedRef: UnwrapRef<typeof import('@vueuse/core')['debouncedRef']>
     readonly debouncedWatch: UnwrapRef<typeof import('@vueuse/core')['debouncedWatch']>
     readonly defineAsyncComponent: UnwrapRef<typeof import('vue')['defineAsyncComponent']>
@@ -357,8 +369,10 @@ declare module 'vue' {
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
+    readonly getColor: UnwrapRef<typeof import('./src/stores/colors')['getColor']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
+    readonly getRandomNotUsedColor: UnwrapRef<typeof import('./src/stores/colors')['getRandomNotUsedColor']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
@@ -369,9 +383,11 @@ declare module 'vue' {
     readonly isReactive: UnwrapRef<typeof import('vue')['isReactive']>
     readonly isReadonly: UnwrapRef<typeof import('vue')['isReadonly']>
     readonly isRef: UnwrapRef<typeof import('vue')['isRef']>
+    readonly lightColors: UnwrapRef<typeof import('./src/stores/colors')['lightColors']>
     readonly makeDestructurable: UnwrapRef<typeof import('@vueuse/core')['makeDestructurable']>
     readonly markRaw: UnwrapRef<typeof import('vue')['markRaw']>
     readonly measureText: UnwrapRef<typeof import('./src/utils')['measureText']>
+    readonly mode: UnwrapRef<typeof import('./src/stores/colors')['mode']>
     readonly nextTick: UnwrapRef<typeof import('vue')['nextTick']>
     readonly onActivated: UnwrapRef<typeof import('vue')['onActivated']>
     readonly onBeforeMount: UnwrapRef<typeof import('vue')['onBeforeMount']>
@@ -396,6 +412,7 @@ declare module 'vue' {
     readonly pausableWatch: UnwrapRef<typeof import('@vueuse/core')['pausableWatch']>
     readonly provide: UnwrapRef<typeof import('vue')['provide']>
     readonly provideLocal: UnwrapRef<typeof import('@vueuse/core')['provideLocal']>
+    readonly rainbowColors: UnwrapRef<typeof import('./src/stores/colors')['rainbowColors']>
     readonly reactify: UnwrapRef<typeof import('@vueuse/core')['reactify']>
     readonly reactifyObject: UnwrapRef<typeof import('@vueuse/core')['reactifyObject']>
     readonly reactive: UnwrapRef<typeof import('vue')['reactive']>

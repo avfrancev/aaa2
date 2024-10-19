@@ -5,7 +5,7 @@ import { curveMonotoneX, curveStepAfter, curveStepBefore, line } from 'd3-shape'
 
 const props = defineProps<{ pulses: Pulses }>()
 
-const asd = 123
+// const asd = 123
 
 // import { getCurrentViewStore} from '../stores/view.store';
 // const viewStore = getCurrentViewStore()
