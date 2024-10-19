@@ -36,7 +36,7 @@ export default {
           'slideLeftAndFade 300ms cubic-bezier(0.16, 1, 0.3, 1)',
         slideUpAndFade: 'slideUpAndFade 300ms cubic-bezier(0.16, 1, 0.3, 1)',
         slideRightAndFade:
-          "slideRightAndFade 300ms cubic-bezier(0.16, 1, 0.3, 1)",
+          'slideRightAndFade 300ms cubic-bezier(0.16, 1, 0.3, 1)',
         overlayShow: 'overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
         contentShow: 'contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1)',
       },

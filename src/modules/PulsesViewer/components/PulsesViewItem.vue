@@ -61,15 +61,15 @@ div.relative(
       AlertDialogRoot
         AlertDialogTrigger
           button.btn.btn-sm(class="hover:btn-error")
-          i-ph:acorn
+            i-ph:airplay-light
         AlertDialogPortal
           AlertDialogOverlay(class="AlertDialogOverlay")
           AlertDialogContent(class="AlertDialogContent")
-            AlertDialogTitle ALKSDJALSD
-            AlertDialogDescription askjdashfkjsa
+            AlertDialogTitle.text-xl.my-3 Delete pulses
+            AlertDialogDescription Really delete pulses?
             div(class="flex justify-end gap-[25px]")
               AlertDialogCancel(class="btn btn-sm btn-ghost") Cancel
-              AlertDialogAction(class="btn btn-sm btn-primary" @click="pulsesStore.remove(props.pulses)") Delete
+              AlertDialogAction(class="btn btn-sm btn-error" @click="pulsesStore.remove(props.pulses)") Delete
 
   //- pre {{ props.pulses.viewBox }}
   svg.w-full(
