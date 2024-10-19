@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AAA: typeof import('./src/components/AAA.vue')['default']
     'ICarbon:fullscreen': typeof import('~icons/carbon/fullscreen')['default']
     'ICarbon:moon': typeof import('~icons/carbon/moon')['default']
     'ICarbon:sun': typeof import('~icons/carbon/sun')['default']
