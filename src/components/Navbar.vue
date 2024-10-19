@@ -1,3 +1,15 @@
+<script setup lang="ts">
+// const { currentSession, sessions, addSession, removeSession: _removeSession } = useSessionsStore()
+// const config = useConfig()
+
+// import  { mode } from '~/stores/colors'
+// console.log(mode.system.value);
+
+const isDark = useDark()
+const toggleDark = useToggle(isDark)
+const fullscreen = useFullscreen()
+</script>
+
 <template lang="pug">
 div(class="flex my-4 items-center overflow-x-auto")
   div(class="flex items-center mr-0 md:mr-4")
@@ -32,17 +44,3 @@ div(class="flex my-4 items-center overflow-x-auto")
     .size-12.bg-success.text-success-content OOO
     .size-12.bg-info.text-info-content OOO
 </template>
-
-<script setup lang="ts">
-
-// const { currentSession, sessions, addSession, removeSession: _removeSession } = useSessionsStore()
-const config = useConfig()
-
-// import  { mode } from '~/stores/colors'
-// console.log(mode.system.value);
-
-const isDark = useDark()
-const toggleDark = useToggle(isDark)
-const fullscreen = useFullscreen()
-
-</script>

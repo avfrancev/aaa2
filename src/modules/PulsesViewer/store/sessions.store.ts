@@ -1,11 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 
 export const useSessionsStore = createGlobalState(() => {
-
   // export function useSessionsStore() {
-  const sessions = useLocalStorage("sessions", new Set<string>())
+  const sessions = useLocalStorage('sessions', new Set<string>())
 
-  const currentSession = useLocalStorage('currentSession', "")
+  const currentSession = useLocalStorage('currentSession', '')
 
   if (!sessions.value.size) {
     currentSession.value = addSession()
@@ -24,6 +23,6 @@ export const useSessionsStore = createGlobalState(() => {
     sessions,
     addSession,
     removeSession,
-    currentSession
+    currentSession,
   }
 })

@@ -5,7 +5,6 @@ import { GesturePlugin } from '@vueuse/gesture'
 import App from './App.vue'
 // import { createPinia } from "pinia"
 
-
 // import '@unocss/reset/tailwind.css'
 // import 'uno.css'
 import './styles/main.css'
@@ -19,4 +18,3 @@ const app = createApp(App)
 // app.use(router)
 app.use(GesturePlugin)
 app.mount('#app')
-
