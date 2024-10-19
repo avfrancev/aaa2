@@ -52,10 +52,11 @@ export default defineConfig({
       ],
       dts: true,
       dirs: [
-        './src/**',
-        // './src/modules/**/',
-        // './src/composables',
-        // './src/models',
+        './src*',
+        './src/modules/**/',
+        './src/composables',
+        './src/models',
+        // './node_modules/pulseplot/lib/*.js',
       ],
       vueTemplate: true,
     }),
@@ -86,4 +87,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
   },
+  // optimizeDeps: {
+  //   include: [
+  //     './node_modules/pulseplot/lib/*.js',
+  //   ],
+  // },
 })

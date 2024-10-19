@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AAA: typeof import('./src/components/AAA.vue')['default']
     AlertDialogAction: typeof import('radix-vue')['AlertDialogAction']
     AlertDialogCancel: typeof import('radix-vue')['AlertDialogCancel']
     AlertDialogContent: typeof import('radix-vue')['AlertDialogContent']

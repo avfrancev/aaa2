@@ -1,10 +1,9 @@
+import type { PulsesItem } from '../models/Pulses'
+import { scaleLinear } from 'd3-scale'
+import { Bitbuffer } from 'pulseplot/lib/bitbuffer.js'
 import { Analyzer } from 'pulseplot/lib/histogram.js'
 import { sliceGuess } from 'pulseplot/lib/slicer.js'
-import { Bitbuffer } from 'pulseplot/lib/bitbuffer.js'
-import { bisector } from 'd3-array';
-import { scaleLinear } from 'd3-scale';
-import { PulsesItem } from '../models/Pulses';
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from 'uuid'
 
 export interface IAnalyzerWorkerArgs {
   measurementID: number | string
@@ -40,7 +39,7 @@ export interface ISliceGuessResult {
 
 export type HintsGroups = ReturnType<typeof createHintsGroups>
 
-export type BitsHints = [number, number, "X" | "O" | "1"]
+export type BitsHints = [number, number, 'X' | 'O' | '1']
 export type IBitsHintsGroup = BitsHints[] & {
   // asd: number
   bbuf: Bitbuffer
@@ -51,7 +50,7 @@ export type IBitsHintsGroup = BitsHints[] & {
   hintsGroups: HintsGroups
 }
 
-export type Hint = {
+export interface Hint {
   id: string
   x1: number
   x2: number
@@ -61,27 +60,28 @@ export type Hint = {
   label: string
 }
 
-function splitArrayWithDelimiter<T>(arr: T[] = [], delimiterCallback: Function) {
-  let result = [[]] as T[][]
+function splitArrayWithDelimiter<T>(arr: T[] = [], delimiterCallback: (item: T, i: number, arr: T[]) => boolean) {
+  const result = [[]] as T[][]
   arr.forEach((item, i) => {
     if (delimiterCallback(item, i, arr)) {
       result.push([item])
-    } else {
+    }
+    else {
       result[result.length - 1].push(item)
     }
   })
-  return result.filter((g) => g.length)
+  return result.filter(g => g.length)
 }
 
 interface SharedWorkerGlobalScope {
-  onconnect: (event: MessageEvent) => void;
+  onconnect: (event: MessageEvent) => void
 }
 
 function toHexadecimal(num: number) {
   if (num < 0 || num > 255) {
-    return 'Error: Input must be between 0 and 255.';
+    return 'Error: Input must be between 0 and 255.'
   }
-  return '0x' + num.toString(16).padStart(2, '0').toUpperCase();
+  return `0x${num.toString(16).padStart(2, '0').toUpperCase()}`
 }
 
 function createBytesHints(g: Hint[]) {
@@ -90,15 +90,16 @@ function createBytesHints(g: Hint[]) {
     bbuf.pushSymbol(h.label)
   }
   return bbuf.bytes.map((byte: string, i: number): Hint & { bits: Hint[] } => {
-    let startBit = g[i * 8]
+    const startBit = g[i * 8]
     let endBit = g[i * 8 + 7]
     const bits = g.slice(i * 8, i * 8 + 8).toSorted((a, b) => a.scaledWidth - b.scaledWidth)
-    if (!endBit) endBit = g[g.length - 1]
-    let x1 = startBit.x1
-    let x2 = endBit.x2
-    let scaledX1 = startBit.scaledX1
-    let scaledX2 = endBit.scaledX2
-    let scaledWidth = scaledX2 - scaledX1
+    if (!endBit)
+      endBit = g[g.length - 1]
+    const x1 = startBit.x1
+    const x2 = endBit.x2
+    const scaledX1 = startBit.scaledX1
+    const scaledX2 = endBit.scaledX2
+    const scaledWidth = scaledX2 - scaledX1
     const label = toHexadecimal(+byte)
 
     // return {id: (i + scaledX1), x1, x2, scaledX1, scaledX2, scaledWidth, label, bits}
@@ -106,8 +107,8 @@ function createBytesHints(g: Hint[]) {
   })
 }
 
-function createHintsGroups(_hints: BitsHints[], xScale: Function, firstPulse: PulsesItem, lastPulse: PulsesItem, rangeIds: [number, number]) {
-  const hints = _hints.map((h, id) => {
+function createHintsGroups(_hints: BitsHints[], xScale: (x: number) => number, firstPulse: PulsesItem, lastPulse: PulsesItem) {
+  const hints = _hints.map((h) => {
     const x1 = h[0] + firstPulse.time
     const x2 = h[1] ? (h[1] + firstPulse.time) : lastPulse.time
     const scaledX1 = xScale(x1)
@@ -115,15 +116,18 @@ function createHintsGroups(_hints: BitsHints[], xScale: Function, firstPulse: Pu
     const scaledWidth = scaledX2 - scaledX1
     return {
       id: uuid(),
-      x1, x2,
-      scaledX1, scaledX2, scaledWidth,
+      x1,
+      x2,
+      scaledX1,
+      scaledX2,
+      scaledWidth,
       label: h[2],
     }
   })
   const groups = splitArrayWithDelimiter(hints, (h: Hint, i: number, arr: Hint[]) => {
-    let prev = arr[i - 1]
-    let hasBreak = !prev || prev.x2 !== h.x1
-    return hasBreak || h.label === "X"
+    const prev = arr[i - 1]
+    const hasBreak = !prev || prev.x2 !== h.x1
+    return hasBreak || h.label === 'X'
   })
   return groups.map((g) => {
     return {
@@ -138,10 +142,11 @@ function createHintsGroups(_hints: BitsHints[], xScale: Function, firstPulse: Pu
   })
 }
 
-const _self: SharedWorkerGlobalScope = self as any;
+// eslint-disable-next-line no-restricted-globals
+const _self: SharedWorkerGlobalScope = self as any
 
 _self.onconnect = (e) => {
-  const port = e.ports[0];
+  const port = e.ports[0]
   port.onmessage = (e) => {
     const {
       measurementID,
@@ -153,21 +158,23 @@ _self.onconnect = (e) => {
       lastPulse,
     } = e.data as IAnalyzerWorkerArgs
 
-    let xScale = scaleLinear().domain(scale.domain).range(scale.range)
+    const xScale = scaleLinear().domain(scale.domain).range(scale.range)
 
     const pulses = allPulses.slice(...rangeIds)
-
 
     const analyzer = new Analyzer(pulses)
     const guessed = analyzer.guess()
     guessed.modulation = pickedSlicer || guessed.modulation
     const sg = sliceGuess(pulses, guessed) as ISliceGuessResult
 
-    const hintsGroups = createHintsGroups(sg.hints || [], xScale, firstPulse, lastPulse, rangeIds)
+    const hintsGroups = createHintsGroups(sg.hints || [], xScale, firstPulse, lastPulse)
 
     const result: IAnalyzerWorkerResult = {
-      measurementID, analyzer, guessed, sliceGuess: { ...sg, hintsGroups }
+      measurementID,
+      analyzer,
+      guessed,
+      sliceGuess: { ...sg, hintsGroups },
     }
     port.postMessage(result)
   }
-};
+}

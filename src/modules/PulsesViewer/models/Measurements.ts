@@ -1,19 +1,19 @@
-import { getRandomNotUsedColor } from "~/stores/colors"
-import { Pulses } from "./Pulses"
+import type { Pulses } from './Pulses'
+import { getRandomNotUsedColor } from '~/stores/colors'
 // import { EffectScope, ShallowReactive } from "vue"
 // import { IAnalyzerWorkerArgs, IAnalyzerWorkerResult } from "../workers/analyzerWorker"
-import { v4 } from "uuid"
-import { Decoder } from "./MeasurementDecoders"
+import { v4 } from 'uuid'
+import { Decoder } from './MeasurementDecoders'
 // import { Decoder } from "./MeasurementDecoders"
 // import { PulsesStore } from "../store"
 
-export type MeasurementStorage = ReturnType<Measurement["toJSON"]>
+export type MeasurementStorage = ReturnType<Measurement['toJSON']>
 
 export class Measurement {
   id = v4()
   x1 = ref(0)
   x2 = ref(0)
-  color = ref("#000000")
+  color = ref('#000000')
   isHovered = ref(false)
   isSelected = ref(false)
   rectRef = ref<Element | ComponentPublicInstance>()
@@ -22,7 +22,7 @@ export class Measurement {
     public pulses: Pulses,
     x1: number,
     x2: number,
-    color = getRandomNotUsedColor()
+    color = getRandomNotUsedColor(),
   ) {
     this.x1.value = x1
     this.x2.value = x2
@@ -32,7 +32,7 @@ export class Measurement {
   }
 
   get xScale() { return this.pulses.pulsesStore.xScale.value }
-  
+
   minX = computed(() => Math.min(toValue(this.x1), toValue(this.x2)))
   maxX = computed(() => Math.max(toValue(this.x1), toValue(this.x2)))
   scaledX1 = computed(() => this.xScale(toValue(this.x1)) || 0)
@@ -42,8 +42,9 @@ export class Measurement {
   scaledWidth = computed(() => this.scaledMaxX.value - this.scaledMinX.value)
   rangeIds = computed<[number, number]>(() => [
     this.pulses.timeBisector?.left(this.pulses.data.value, this.minX.value),
-    this.pulses.timeBisector?.center(this.pulses.data.value, this.maxX.value)
+    this.pulses.timeBisector?.center(this.pulses.data.value, this.maxX.value),
   ])
+
   firstPulse = computed(() => this.pulses.data.value[this.rangeIds.value[0]])
   lastPulse = computed(() => this.pulses.data.value[this.rangeIds.value[1]])
   p2pWidth = computed(() => this.lastPulse.value?.scaledTime - this.firstPulse.value?.scaledTime)
@@ -51,11 +52,11 @@ export class Measurement {
   remove() {
     this.pulses.measurements.delete(this)
   }
-  
+
   changeColor() {
     this.color.value = getRandomNotUsedColor()
   }
-  
+
   toJSON() {
     return {
       x1: toValue(this.x1),

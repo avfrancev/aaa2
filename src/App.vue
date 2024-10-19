@@ -1,14 +1,13 @@
+<script setup lang="ts">
+
+</script>
+
 <template lang="pug">
 main(class="container mx-auto px-2 min-h-svh grid")
   .flex.flex-col
     Navbar
     PulsesViewer.flex-1
 </template>
-
-
-<script setup lang="ts">
-
-</script>
 
 <style lang="sass">
   html, body

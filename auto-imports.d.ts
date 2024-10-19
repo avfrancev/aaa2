@@ -6,15 +6,26 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const Analyzer: typeof import('./node_modules/pulseplot/lib/histogram.js')['Analyzer']
+  const Bitbuffer: typeof import('./node_modules/pulseplot/lib/bitbuffer.js')['Bitbuffer']
   const Decoder: typeof import('./src/modules/PulsesViewer/models/MeasurementDecoders')['Decoder']
-  const ESP32: typeof import('./src/stores/ESP32')['default']
+  const Demos: typeof import('./node_modules/pulseplot/lib/demos.js')['Demos']
+  const DropZone: typeof import('./node_modules/pulseplot/lib/dropzone.js')['DropZone']
+  const ESP32: typeof import('./src/modules/PulsesViewer/store/ESP32')['default']
   const EffectScope: typeof import('vue')['EffectScope']
+  const Hexbuffer: typeof import('./node_modules/pulseplot/lib/hexbuffer.js')['Hexbuffer']
+  const Histogram: typeof import('./node_modules/pulseplot/lib/histogram.js')['Histogram']
   const Measurement: typeof import('./src/modules/PulsesViewer/models/Measurements')['Measurement']
+  const PulseBuilder: typeof import('./node_modules/pulseplot/lib/builder.js')['PulseBuilder']
+  const Pulseplot: typeof import('./node_modules/pulseplot/lib/pulseplot.js')['Pulseplot']
   const Pulses: typeof import('./src/modules/PulsesViewer/models/Pulses')['Pulses']
   const PulsesStore: typeof import('./src/modules/PulsesViewer/store/pulses.store')['PulsesStore']
+  const RfRaw: typeof import('./node_modules/pulseplot/lib/rfraw.js')['RfRaw']
   const ZoomTransform: typeof import('./src/composables/usePanZoom')['ZoomTransform']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
+  const autorange: typeof import('./node_modules/pulseplot/lib/autorange.js')['autorange']
+  const autorange_time: typeof import('./node_modules/pulseplot/lib/autorange.js')['autorange_time']
   const colors: typeof import('./src/stores/colors')['colors']
   const computed: typeof import('vue')['computed']
   const computedAsync: typeof import('@vueuse/core')['computedAsync']
@@ -25,13 +36,9 @@ declare global {
   const controlledComputed: typeof import('@vueuse/core')['controlledComputed']
   const controlledRef: typeof import('@vueuse/core')['controlledRef']
   const createApp: typeof import('vue')['createApp']
-  const createDecoder: typeof import('./src/modules/PulsesViewer/models/MeasurementDecoders')['createDecoder']
   const createEventHook: typeof import('@vueuse/core')['createEventHook']
   const createGlobalState: typeof import('@vueuse/core')['createGlobalState']
   const createInjectionState: typeof import('@vueuse/core')['createInjectionState']
-  const createMeasurement: typeof import('./src/modules/PulsesViewer/modelZZzzz/Measurements')['createMeasurement']
-  const createPulses: typeof import('./src/modules/PulsesViewer/modelZZzzz/Pulses')['createPulses']
-  const createPulsesStore: typeof import('./src/modules/PulsesViewer/store/pulses.store')['createPulsesStore']
   const createReactiveFn: typeof import('@vueuse/core')['createReactiveFn']
   const createReusableTemplate: typeof import('@vueuse/core')['createReusableTemplate']
   const createSharedComposable: typeof import('@vueuse/core')['createSharedComposable']
@@ -51,6 +58,7 @@ declare global {
   const getColor: typeof import('./src/stores/colors')['getColor']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
+  const getDemos: typeof import('./node_modules/pulseplot/lib/demos.js')['getDemos']
   const getRandomNotUsedColor: typeof import('./src/stores/colors')['getRandomNotUsedColor']
   const h: typeof import('vue')['h']
   const ignorableWatch: typeof import('@vueuse/core')['ignorableWatch']
@@ -63,10 +71,8 @@ declare global {
   const isReadonly: typeof import('vue')['isReadonly']
   const isRef: typeof import('vue')['isRef']
   const lightColors: typeof import('./src/stores/colors')['lightColors']
+  const lookup: typeof import('./node_modules/pulseplot/lib/utils.js')['lookup']
   const makeDestructurable: typeof import('@vueuse/core')['makeDestructurable']
-  const makeSeparatedStore: typeof import('./src/utils')['makeSeparatedStore']
-  const mapToObject: typeof import('./src/utils')['mapToObject']
-  const mapValuesToArray: typeof import('./src/utils')['mapValuesToArray']
   const markRaw: typeof import('vue')['markRaw']
   const measureText: typeof import('./src/utils')['measureText']
   const mode: typeof import('./src/stores/colors')['mode']
@@ -92,7 +98,6 @@ declare global {
   const onUpdated: typeof import('vue')['onUpdated']
   const onWatcherCleanup: typeof import('vue')['onWatcherCleanup']
   const pausableWatch: typeof import('@vueuse/core')['pausableWatch']
-  const pick: typeof import('./src/utils')['pick']
   const provide: typeof import('vue')['provide']
   const provideLocal: typeof import('@vueuse/core')['provideLocal']
   const rainbowColors: typeof import('./src/stores/colors')['rainbowColors']
@@ -112,9 +117,22 @@ declare global {
   const resolveComponent: typeof import('vue')['resolveComponent']
   const resolveRef: typeof import('@vueuse/core')['resolveRef']
   const resolveUnref: typeof import('@vueuse/core')['resolveUnref']
+  const selector: typeof import('./node_modules/pulseplot/lib/utils.js')['selector']
   const shallowReactive: typeof import('vue')['shallowReactive']
   const shallowReadonly: typeof import('vue')['shallowReadonly']
   const shallowRef: typeof import('vue')['shallowRef']
+  const sliceCMI: typeof import('./node_modules/pulseplot/lib/slicer.js')['sliceCMI']
+  const sliceDM: typeof import('./node_modules/pulseplot/lib/slicer.js')['sliceDM']
+  const sliceGuess: typeof import('./node_modules/pulseplot/lib/slicer.js')['sliceGuess']
+  const sliceMC: typeof import('./node_modules/pulseplot/lib/slicer.js')['sliceMC']
+  const sliceNRZ: typeof import('./node_modules/pulseplot/lib/slicer.js')['sliceNRZ']
+  const sliceNRZI: typeof import('./node_modules/pulseplot/lib/slicer.js')['sliceNRZI']
+  const slicePCM: typeof import('./node_modules/pulseplot/lib/slicer.js')['slicePCM']
+  const slicePIWM: typeof import('./node_modules/pulseplot/lib/slicer.js')['slicePIWM']
+  const slicePPM: typeof import('./node_modules/pulseplot/lib/slicer.js')['slicePPM']
+  const slicePWM: typeof import('./node_modules/pulseplot/lib/slicer.js')['slicePWM']
+  const sliceRZ: typeof import('./node_modules/pulseplot/lib/slicer.js')['sliceRZ']
+  const strip: typeof import('./node_modules/pulseplot/lib/utils.js')['strip']
   const syncRef: typeof import('@vueuse/core')['syncRef']
   const syncRefs: typeof import('@vueuse/core')['syncRefs']
   const templateRef: typeof import('@vueuse/core')['templateRef']
@@ -184,6 +202,7 @@ declare global {
   const useDocumentVisibility: typeof import('@vueuse/core')['useDocumentVisibility']
   const useDraggable: typeof import('@vueuse/core')['useDraggable']
   const useDropZone: typeof import('@vueuse/core')['useDropZone']
+  const useESP32: typeof import('./src/modules/PulsesViewer/store/ESP32')['useESP32']
   const useElementBounding: typeof import('@vueuse/core')['useElementBounding']
   const useElementByPoint: typeof import('@vueuse/core')['useElementByPoint']
   const useElementHover: typeof import('@vueuse/core')['useElementHover']
@@ -332,7 +351,6 @@ declare module 'vue' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly Decoder: UnwrapRef<typeof import('./src/modules/PulsesViewer/models/MeasurementDecoders')['Decoder']>
-    readonly ESP32: UnwrapRef<typeof import('./src/stores/ESP32')['default']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly Measurement: UnwrapRef<typeof import('./src/modules/PulsesViewer/models/Measurements')['Measurement']>
     readonly Pulses: UnwrapRef<typeof import('./src/modules/PulsesViewer/models/Pulses')['Pulses']>
@@ -340,13 +358,11 @@ declare module 'vue' {
     readonly ZoomTransform: UnwrapRef<typeof import('./src/composables/usePanZoom')['ZoomTransform']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('@vueuse/core')['autoResetRef']>
-    readonly colors: UnwrapRef<typeof import('./src/stores/colors')['colors']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly computedAsync: UnwrapRef<typeof import('@vueuse/core')['computedAsync']>
     readonly computedEager: UnwrapRef<typeof import('@vueuse/core')['computedEager']>
     readonly computedInject: UnwrapRef<typeof import('@vueuse/core')['computedInject']>
     readonly computedWithControl: UnwrapRef<typeof import('@vueuse/core')['computedWithControl']>
-    readonly config: UnwrapRef<typeof import('./src/stores/config')['default']>
     readonly controlledComputed: UnwrapRef<typeof import('@vueuse/core')['controlledComputed']>
     readonly controlledRef: UnwrapRef<typeof import('@vueuse/core')['controlledRef']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
@@ -361,7 +377,6 @@ declare module 'vue' {
     readonly createView: UnwrapRef<typeof import('./src/composables/usePanZoom')['createView']>
     readonly createViewStore: UnwrapRef<typeof import('./src/modules/PulsesViewer/store/view.store')['createViewStore']>
     readonly customRef: UnwrapRef<typeof import('vue')['customRef']>
-    readonly darkColors: UnwrapRef<typeof import('./src/stores/colors')['darkColors']>
     readonly debouncedRef: UnwrapRef<typeof import('@vueuse/core')['debouncedRef']>
     readonly debouncedWatch: UnwrapRef<typeof import('@vueuse/core')['debouncedWatch']>
     readonly defineAsyncComponent: UnwrapRef<typeof import('vue')['defineAsyncComponent']>
@@ -369,10 +384,8 @@ declare module 'vue' {
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
-    readonly getColor: UnwrapRef<typeof import('./src/stores/colors')['getColor']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
-    readonly getRandomNotUsedColor: UnwrapRef<typeof import('./src/stores/colors')['getRandomNotUsedColor']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
@@ -383,11 +396,9 @@ declare module 'vue' {
     readonly isReactive: UnwrapRef<typeof import('vue')['isReactive']>
     readonly isReadonly: UnwrapRef<typeof import('vue')['isReadonly']>
     readonly isRef: UnwrapRef<typeof import('vue')['isRef']>
-    readonly lightColors: UnwrapRef<typeof import('./src/stores/colors')['lightColors']>
     readonly makeDestructurable: UnwrapRef<typeof import('@vueuse/core')['makeDestructurable']>
     readonly markRaw: UnwrapRef<typeof import('vue')['markRaw']>
     readonly measureText: UnwrapRef<typeof import('./src/utils')['measureText']>
-    readonly mode: UnwrapRef<typeof import('./src/stores/colors')['mode']>
     readonly nextTick: UnwrapRef<typeof import('vue')['nextTick']>
     readonly onActivated: UnwrapRef<typeof import('vue')['onActivated']>
     readonly onBeforeMount: UnwrapRef<typeof import('vue')['onBeforeMount']>
@@ -412,7 +423,6 @@ declare module 'vue' {
     readonly pausableWatch: UnwrapRef<typeof import('@vueuse/core')['pausableWatch']>
     readonly provide: UnwrapRef<typeof import('vue')['provide']>
     readonly provideLocal: UnwrapRef<typeof import('@vueuse/core')['provideLocal']>
-    readonly rainbowColors: UnwrapRef<typeof import('./src/stores/colors')['rainbowColors']>
     readonly reactify: UnwrapRef<typeof import('@vueuse/core')['reactify']>
     readonly reactifyObject: UnwrapRef<typeof import('@vueuse/core')['reactifyObject']>
     readonly reactive: UnwrapRef<typeof import('vue')['reactive']>
@@ -501,6 +511,7 @@ declare module 'vue' {
     readonly useDocumentVisibility: UnwrapRef<typeof import('@vueuse/core')['useDocumentVisibility']>
     readonly useDraggable: UnwrapRef<typeof import('@vueuse/core')['useDraggable']>
     readonly useDropZone: UnwrapRef<typeof import('@vueuse/core')['useDropZone']>
+    readonly useESP32: UnwrapRef<typeof import('./src/modules/PulsesViewer/store/ESP32')['useESP32']>
     readonly useElementBounding: UnwrapRef<typeof import('@vueuse/core')['useElementBounding']>
     readonly useElementByPoint: UnwrapRef<typeof import('@vueuse/core')['useElementByPoint']>
     readonly useElementHover: UnwrapRef<typeof import('@vueuse/core')['useElementHover']>
