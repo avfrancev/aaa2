@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Pulses } from '../models/Pulses'
+import type { Pulses } from "../models/Pulses"
 
 const { pulses, top = 15, bottom = 100 - 15 } = defineProps<{ pulses: Pulses, top?: number, bottom?: number }>()
 const pulsesStore = usePulsesStore()
@@ -29,7 +29,7 @@ function viewPortConstraints(x: number, text: string, padding = 10) {
 const metaData = computed(() => {
   const p = pulsesUnderCursor.value
 
-  const label1 = p[0]?.width.toFixed(0) || ''
+  const label1 = p[0]?.width.toFixed(0) || ""
   const l1 = {
     x1: p[0]?.scaledTime || 0,
     x2: (p[0]?.scaledTime + p[0]?.scaledWidth) || 0,
@@ -38,7 +38,7 @@ const metaData = computed(() => {
     labelPos: viewPortConstraints(p[0]?.scaledTime + p[0]?.scaledWidth / 2, label1),
   }
 
-  const label2 = (p[0]?.width + p[1]?.width).toFixed(0) || ''
+  const label2 = (p[0]?.width + p[1]?.width).toFixed(0) || ""
   const l2 = p.length === 1
     ? null
     : {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Measurement } from '../models/Measurements'
-import type { Pulses, PulsesItem } from '../models/Pulses'
-import { curveStepAfter, line } from 'd3-shape'
+import type { Measurement } from "../models/Measurements"
+import type { Pulses, PulsesItem } from "../models/Pulses"
+import { curveStepAfter, line } from "d3-shape"
 
 const props = defineProps<{ pulses: Pulses }>()
 
@@ -59,17 +59,25 @@ div.relative(
     .actions(v-show="pulses.isHovered.value")
       button.btn.btn-sm(class="hover:btn-error" @click="pulsesStore.remove(props.pulses)") X
       AlertDialogRoot
-        AlertDialogTrigger
-          button.btn.btn-sm(class="hover:btn-error")
-            i-ph:airplay-light
+        AlertDialogTrigger(class="btn btn-sm btn-ghost")
+          //- button.btn.btn-sm(class="hover:btn-error")
+          i-ph:airplay-light
         AlertDialogPortal
-          AlertDialogOverlay(class="AlertDialogOverlay")
-          AlertDialogContent(class="AlertDialogContent")
+          AlertDialogOverlay(class="DialogOverlay")
+          AlertDialogContent(class="DialogContent")
             AlertDialogTitle.text-xl.my-3 Delete pulses
             AlertDialogDescription Really delete pulses?
             div(class="flex justify-end gap-[25px]")
               AlertDialogCancel(class="btn btn-sm btn-ghost") Cancel
               AlertDialogAction(class="btn btn-sm btn-error" @click="pulsesStore.remove(props.pulses)") Delete
+      DialogRoot
+        DialogTrigger(class="btn btn-sm btn-ghost")
+          i-ph:ambulance-light
+        DialogPortal
+        DialogOverlay(class="DialogOverlay")
+        DialogContent(class="DialogContent")
+          //- div {{props.pulses.le}}
+          DialogClose(class="btn btn-sm btn-ghost") Close
 
   //- pre {{ props.pulses.viewBox }}
   svg.w-full(

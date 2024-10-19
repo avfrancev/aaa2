@@ -1,27 +1,30 @@
 /* eslint no-console: ["error", { allow: ["log"] }] */
 
-import type { IAnalyzerWorkerArgs, IAnalyzerWorkerResult } from '../workers/analyzer.worker'
-import type { Measurement } from './Measurements'
-import AnalyzerWorker from '../workers/analyzer.worker?sharedworker'
+import type { IAnalyzerWorkerArgs, IAnalyzerWorkerResult } from "../workers/analyzer.worker"
+import type { Measurement } from "./Measurements"
+import AnalyzerWorker from "../workers/analyzer.worker?sharedworker"
 
 const analyzerWorker = new AnalyzerWorker()
 analyzerWorker.port.start()
 analyzerWorker.port.onmessageerror = (e) => {
-  console.log('SHARED WORKER ERROR', e)
+  console.log("SHARED WORKER ERROR", e)
 }
+const a: any = 12
+console.log(a)
+
 export class Decoder {
   state = shallowReactive({
     isLoading: false,
     analyzer: {},
     guessed: {},
-    sliceGuess: null as (IAnalyzerWorkerResult['sliceGuess'] | null),
+    sliceGuess: null as (IAnalyzerWorkerResult["sliceGuess"] | null),
   } as IAnalyzerWorkerResult & { isLoading: boolean })
 
   constructor(m: Measurement) {
     const pulsesStore = m.pulses.pulsesStore
     const p = m.id
 
-    analyzerWorker.port.addEventListener('message', (e: MessageEvent<any>) => {
+    analyzerWorker.port.addEventListener("message", (e: MessageEvent) => {
       const data: IAnalyzerWorkerResult = e.data
 
       if (data.measurementID === p) {

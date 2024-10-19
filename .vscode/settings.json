@@ -36,6 +36,7 @@
     "typescriptreact",
     "vue",
     "html",
+    "pug",
     "markdown",
     "json",
     "json5",
@@ -50,6 +51,6 @@
     "less",
     "scss",
     "pcss",
-    "postcss"
+    "postcss",
   ]
 }

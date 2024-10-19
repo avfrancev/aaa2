@@ -31,17 +31,18 @@
 @layer components {
   .SelectContent {
     @apply bg-base-300 rounded z-[100];
+    @apply will-change-[opacity,transform] data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade
   }
   .SelectItem {
-    @apply cursor-pointer hover:text-primary text-sm leading-none flex items-center h-8 pr-8 relative select-none rounded-[3px] pl-[25px] data-[disabled]:pointer-events-none data-[highlighted]:outline-none
+    @apply cursor-pointer data-[highlighted]:text-primary text-sm leading-none flex items-center h-8 pr-8 relative select-none rounded-[3px] pl-[25px] data-[disabled]:pointer-events-none data-[highlighted]:outline-none
   }
   .SelectScrollButton {
     @apply flex items-center justify-center bg-base-300 text-base-content cursor-default h-[25px]
   }
-  .AlertDialogOverlay {
-    @apply bg-base-300/50 data-[state=open]:animate-overlayShow fixed inset-0 z-30
+  .DialogOverlay {
+    @apply bg-black/60 data-[state=open]:animate-overlayShow fixed inset-0 z-30
   }
-  .AlertDialogContent {
-    @apply z-[100] data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[500px] translate-x-[-50%] translate-y-[-50%] rounded bg-base-300 p-4 shadow-[hsl(206_22%_7%_/_35%)_0px_10px_38px_-10px,_hsl(206_22%_7%_/_20%)_0px_10px_20px_-15px] focus:outline-none
+  .DialogContent {
+    @apply z-[100] data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[90vw] max-w-[500px] translate-x-[-50%] translate-y-[-50%] rounded bg-base-300 p-4 shadow-2xl focus:outline-none
   }
 }

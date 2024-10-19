@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { PulsesStorage } from '../models/Pulses'
-import sample_data from '../store/sample_data.json'
+import type { PulsesStorage } from "../models/Pulses"
+import sample_data from "../store/sample_data.json"
 
 const viewEl = ref()
 const viewStore = useViewStore()
@@ -12,7 +12,7 @@ const pulsesStore = usePulsesStore()
 
 const ticksArrayString = computed<string>(() => {
   if (!pulsesStore.xScale)
-    return ''
+    return ""
   return view.ZT.rescaleX(pulsesStore.xScale.value).ticks(6).toString()
 })
 

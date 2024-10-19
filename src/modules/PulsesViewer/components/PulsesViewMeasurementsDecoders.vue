@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { Pulses } from '../models/Pulses'
-import type { Hint, HintsGroups } from '../workers/analyzer.worker'
+import type { Pulses } from "../models/Pulses"
+import type { Hint, HintsGroups } from "../workers/analyzer.worker"
 
 const props = defineProps<{ pulses: Pulses }>()
 
@@ -9,14 +9,13 @@ const { view } = useViewStore()
 const ZT = view.ZT
 // const  = ref<HTMLCanvasElement | null>(null)
 const isRootVisible = useElementVisibility(useCurrentElement())
-// console.log();
 
 const hintsGroups = computed(() => {
   const arr = [] as HintsGroups[]
-  props.pulses.measurements.forEach((m) => {
+  for (const m of props.pulses.measurements) {
     if (m.decoder.state.sliceGuess)
       arr.push(m.decoder.state.sliceGuess.hintsGroups)
-  })
+  }
   return arr
 })
 
@@ -82,7 +81,7 @@ const hintsBitsFiltered = computed(() => {
 
 const groupsRangePathes = computed(() => {
   const groups = hintsGroups.value.flatMap(m => m?.map(g => g))
-  let s = ''
+  let s = ""
   for (const g of groups) {
     if (!g)
       continue
@@ -92,28 +91,28 @@ const groupsRangePathes = computed(() => {
 })
 
 const bitsRombPathes = computed(() => {
-  let s = ''
+  let s = ""
   // return s
-  hintsBitsFiltered.value.forEach((d) => {
+  for (const d of hintsBitsFiltered.value) {
     s += rombPath(d.scaledX1, d.scaledWidth, 20, 5 / ZT.k)
     // m.flatMap(d => d.bits).forEach((d) => {
     //   s += rombPath(d.scaledX1, d.scaledWidth, 20, 5 / ZT.k)
     // })
-  })
+  }
   return s
 })
 
 const bytesRombPathes = computed(() => {
-  let s = ''
-  hintsBytesFiltered.value.forEach((d) => {
+  let s = ""
+  for (const d of hintsBytesFiltered.value) {
     // m.flatMap(d => d).forEach((d) => {
     s += rombPath(d.scaledX1, d.scaledWidth, 20, 5 / ZT.k)
     // })
-  })
+  }
   return s
 })
 
-function rombPath(s: number = 0, w: number, h = 20, p = 5) {
+function rombPath(s: number, w: number, h = 20, p = 5) {
   return `M${s},${h / 2}L${s + p},${h}H${s + w - p}L${s + w},${h / 2}L${s + w - p},${0}H${s + p}L${s},${h / 2}Z`
 }
 </script>
@@ -122,15 +121,14 @@ function rombPath(s: number = 0, w: number, h = 20, p = 5) {
 div(class="h-[20px] w-full pointer-events-none select-none")
   svg(
     v-if="isRootVisible"
+    preserveAspectRatio="none"
     class="h-[20px] w-full font-mono text-xs"
     :viewBox="`${props.pulses.viewBox.value.x} 0 ${props.pulses.viewBox.value.w} 20`"
-    preserveAspectRatio="none"
     @click="() => console.log(hintsBitsFiltered)"
     )
     path.stroke-2.stroke-accent(:d="groupsRangePathes")
     path(:d="bytesRombPathes" class="stroke-1 stroke-secondary-content/70 fill-secondary/70")
     path(:d="bitsRombPathes" class="stroke-1 stroke-secondary-content/70 fill-secondary/70")
-
     text(
       y="15"
       :transform="`matrix(${1 / ZT.k},0,0,1,0,0)`"

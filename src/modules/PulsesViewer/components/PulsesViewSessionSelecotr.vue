@@ -4,7 +4,7 @@ const config = useConfig()
 
 const sessionsSorted = computed(() => {
   if (config.useESP32)
-    return new Set(['ESP32', ...sessions.value])
+    return new Set(["ESP32", ...sessions.value])
   else
     return sessions.value
 })
@@ -19,19 +19,19 @@ function removeSession(session: string) {
 }
 
 watch(() => config.useESP32, () => {
-  if (!config.useESP32 && currentSession.value === 'ESP32') {
+  if (!config.useESP32 && currentSession.value === "ESP32") {
     currentSession.value = [...sessions.value][0]
   }
 })
 </script>
 
 <template lang="pug">
-SelectRoot(v-model="currentSession")
-  SelectTrigger(class="whitespace-nowrap input input-bordered h-8 inline-flex mx-4 items-center space-x-3 focus:outline-none" aria-label="Select session")
+SelectRoot(v-model="currentSession" )
+  SelectTrigger(class="whitespace-nowrap input input-bordered bg-transparent hover:input-primary h-8 inline-flex mx-4 items-center space-x-3" aria-label="Select session")
     SelectValue(placeholder="Select session...")
     i-radix-icons:chevron-down
   SelectPortal
-    SelectContent(class="SelectContent" :side-offset="5")
+    SelectContent(class="SelectContent" :side-offset="5" side="bottom" position="popper")
       SelectScrollUpButton(class="SelectScrollButton")
         i-radix-icons:chevron-up
       SelectViewport(class="relative p-[5px]")
@@ -44,7 +44,7 @@ SelectRoot(v-model="currentSession")
             SelectItemIndicator(class="absolute left-0 inline-flex items-center justify-center w-[25px]")
               i-radix-icons:check
             SelectItemText {{ option === "ESP32" ? "ESP32" : `Session #${index + 1}` }}
-          div(class="absolute top-0 right-0 mt-1s mr-1")
+          div(class="absolute top-0 right-0")
             div(
               v-for="session in sessionsSorted"
               :key="session")
