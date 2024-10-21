@@ -86,9 +86,14 @@ export const usePulsesStore = createGlobalState(() => {
   const { currentSession } = useSessionsStore()
 
   const pulsesStore = shallowReactive(new PulsesStore(currentSession.value))
+  pulsesStore.loadFromStorage()
+  // const pulsesStore = shallowReactive({} as PulsesStore)
 
   watch(() => currentSession.value, () => {
-    Object.assign(pulsesStore, new PulsesStore(currentSession.value))
+    const ps = new PulsesStore(currentSession.value)
+    Object.assign(pulsesStore, ps)
+    // Object.assign(pulsesStore, new PulsesStore(currentSession.value))
+    pulsesStore.loadFromStorage()
   })
 
   return pulsesStore
