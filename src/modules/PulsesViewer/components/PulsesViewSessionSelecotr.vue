@@ -31,7 +31,7 @@ SelectRoot(v-model="currentSession" )
     SelectValue(placeholder="Select session...")
     i-radix-icons:chevron-down
   SelectPortal
-    SelectContent(class="SelectContent" :side-offset="5" side="bottom" position="popper")
+    SelectContent(class="SelectContent" :side-offset="5" position="popper")
       SelectScrollUpButton(class="SelectScrollButton")
         i-radix-icons:chevron-up
       SelectViewport(class="relative p-[5px]")

@@ -1,9 +1,9 @@
-import type { MeasurementStorage } from './Measurements'
-import { bisector, extent, sum } from 'd3-array'
-import { v4 as uuidv4 } from 'uuid'
-import { Measurement } from './Measurements'
+import type { MeasurementStorage } from "./Measurements"
+import { bisector, extent, sum } from "d3-array"
+import { v4 as uuidv4 } from "uuid"
+import { Measurement } from "./Measurements"
 // import { pick } from "~/utils"
-import type { PulsesStore } from '../store/pulses.store'
+import type { PulsesStore } from "../store/pulses.store"
 // import { PulsesStore } from "../store"
 // import { currentPulsesStore } from "../stores/pulses.store"
 
@@ -15,7 +15,7 @@ export interface PulsesItem {
   scaledWidth: number
 }
 
-export type PulsesStorage = ReturnType<Pulses['toJSON']>
+export type PulsesStorage = ReturnType<Pulses["toJSON"]>
 
 export class Pulses {
   id = uuidv4()
@@ -35,9 +35,9 @@ export class Pulses {
     const measurements = Array.from(p.measurements || [])
     if (measurements.length) {
       nextTick(() => {
-        measurements.forEach((m) => {
+        for (const m of measurements) {
           this.addMeasurement(m.x1, m.x2, m.color)
-        })
+        }
       })
     }
   }
@@ -72,7 +72,7 @@ export class Pulses {
   })
 
   remove() {
-    console.warn('Not impllemented')
+    for (const m of this.measurements) m.remove()
   }
 
   setIsHovered(hovering: boolean) {
@@ -81,6 +81,10 @@ export class Pulses {
 
   setXOffset(x: number) {
     this.xOffset.value = x
+  }
+
+  setRawData(data: number[]) {
+    this.raw_data.splice(0, this.raw_data.length, ...data)
   }
 
   addMeasurement(x1: number, x2: number, color?: string) {
@@ -94,7 +98,8 @@ export class Pulses {
       raw_data: this.raw_data,
       xOffset: toValue(this.xOffset),
       rssi: this.rssi,
-      measurements: Array.from(this.measurements as unknown as MeasurementStorage[]),
+      // measurements: Array.from(this.measurements as unknown as MeasurementStorage[]),
+      measurements: Array.from(this.measurements, (m) => m.toJSON()),
     }
   }
 }

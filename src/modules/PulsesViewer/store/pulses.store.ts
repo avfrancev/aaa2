@@ -1,19 +1,19 @@
 // import { currentSession } from "./sessions.store"
-import type { PulsesStorage } from '../models/Pulses'
-import { Pulses } from '../models/Pulses'
+import type { PulsesStorage } from "../models/Pulses"
+import { Pulses } from "../models/Pulses"
 // import viewStore from "./view.store"
-import { max, min } from 'd3-array'
-import { scaleLinear, type ScaleLinear } from 'd3-scale'
+import { max, min } from "d3-array"
+import { scaleLinear, type ScaleLinear } from "d3-scale"
 
 export class PulsesStore {
-  key = ref('')
+  key = ref("")
   data = shallowReactive(new Set<Pulses>())
   storage: Ref<PulsesStorage[] | null>
   constructor(key: string) {
     this.key.value = key
     this.storage = useStorage(`pulsesStore-${key}`, <PulsesStorage[] | null>[])
 
-    setTimeout(() => this.loadFromStorage(), 10)
+    // setTimeout(() => this.loadFromStorage(), 1)
 
     watchDebounced(() => this.dataString.value, () => {
       this.saveToStorage()
@@ -30,10 +30,19 @@ export class PulsesStore {
   pixelRatio = computed(() => (Math.abs(toValue(this.xScale).domain()[0]) + toValue(this.xScale).domain()[1]) / toValue(this.width))
   dataString = computed(() => JSON.stringify(Array.from(this.data)))
 
-  add(obj: PulsesStorage) {
-    const p = new Pulses(this, obj)
+  add(ps: Partial<PulsesStorage> = {}) {
+    const p = new Pulses(this, this.createDefaultPulsesStorage(ps))
     this.data.add(p)
     return p
+  }
+
+  createDefaultPulsesStorage(obj: unknown = {}): PulsesStorage {
+    return Object.assign({
+      raw_data: [],
+      xOffset: 0,
+      rssi: 0,
+      measurements: [],
+    }, obj)
   }
 
   loadFromStorage() {
@@ -41,7 +50,7 @@ export class PulsesStore {
       const s = window.localStorage.getItem(`pulsesStore-${this.key.value}`)
       const parsed = s ? JSON.parse(s) : null
       if (parsed) {
-        parsed.forEach((p: PulsesStorage) => this.add(p))
+        for (const p of parsed) this.add(p)
       }
     }
     catch (e) {
@@ -84,3 +93,9 @@ export const usePulsesStore = createGlobalState(() => {
 
   return pulsesStore
 })
+
+export function copyToSession(s: string, pulses: PulsesStorage) {
+  // console.warn("copyToSession", s, "not implemented")
+  const ps = new PulsesStore(s)
+  ps.add(pulses)
+}

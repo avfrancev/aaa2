@@ -9,8 +9,6 @@ analyzerWorker.port.start()
 analyzerWorker.port.onmessageerror = (e) => {
   console.log("SHARED WORKER ERROR", e)
 }
-const a: any = 12
-console.log(a)
 
 export class Decoder {
   state = shallowReactive({
@@ -20,36 +18,24 @@ export class Decoder {
     sliceGuess: null as (IAnalyzerWorkerResult["sliceGuess"] | null),
   } as IAnalyzerWorkerResult & { isLoading: boolean })
 
+  measurementID: string
+
   constructor(m: Measurement) {
     const pulsesStore = m.pulses.pulsesStore
-    const p = m.id
+    this.measurementID = m.id
 
-    analyzerWorker.port.addEventListener("message", (e: MessageEvent) => {
-      const data: IAnalyzerWorkerResult = e.data
-
-      if (data.measurementID === p) {
-        // console.log(data.sliceGuess);
-        this.state.analyzer = data.analyzer
-        this.state.guessed = data.guessed
-        this.state.sliceGuess = data.sliceGuess
-      }
-    }, false)
+    analyzerWorker.port.addEventListener("message", this.workerListener.bind(this))
 
     const rangeIdsString = computed(() => m.rangeIds.value.toString())
-
-    // const { view } = usePulsesStore()
 
     watch(() =>
       [
         rangeIdsString.value,
+        m.pulses.raw_data,
         m.xScale.domain().toString(),
       ], () => {
-      // const pulses = toRaw(m.pulses.raw_data)
-      // nextTick(() => {
-      // })
-
       const args = {
-        measurementID: p,
+        measurementID: this.measurementID,
         pulses: toRaw(m.pulses.raw_data),
         scale: {
           domain: pulsesStore.xScale.value.domain() as [number, number],
@@ -64,5 +50,18 @@ export class Decoder {
     }, {
       immediate: true,
     })
+  }
+
+  workerListener(e: MessageEvent) {
+    const data: IAnalyzerWorkerResult = e.data
+    if (data.measurementID === this.measurementID) {
+      this.state.analyzer = data.analyzer
+      this.state.guessed = data.guessed
+      this.state.sliceGuess = data.sliceGuess
+    }
+  }
+
+  remove() {
+    analyzerWorker.port.removeEventListener("message", this.workerListener)
   }
 }

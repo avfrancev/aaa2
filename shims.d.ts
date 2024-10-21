@@ -1,11 +1,11 @@
-declare module '*.vue' {
-  import type { DefineComponent } from 'vue'
+declare module "*.vue" {
+  import type { DefineComponent } from "vue"
 
   const component: DefineComponent<object, object, any>
   export default component
 }
 
-declare module 'pulseplot/lib/histogram.js' {
+declare module "pulseplot/lib/histogram.js" {
   export class Histogram {
     constructor(data: any, tolerance?: number)
     bins: any[]
@@ -99,7 +99,7 @@ declare module 'pulseplot/lib/histogram.js' {
   }
 }
 
-declare module 'pulseplot/lib/slicer.js' {
+declare module "pulseplot/lib/slicer.js" {
   export function sliceGuess(pulses: any, guess: any): any[] | {
     hints: any[][]
     bits: Bitbuffer
@@ -144,10 +144,10 @@ declare module 'pulseplot/lib/slicer.js' {
     hints: any[][]
     bits: Bitbuffer
   }
-  import type { Bitbuffer } from 'pulseplot/lib/bitbuffer.js'
+  import type { Bitbuffer } from "pulseplot/lib/bitbuffer.js"
 
 }
-declare module 'pulseplot/lib/bitbuffer.js' {
+declare module "pulseplot/lib/bitbuffer.js" {
   export class Bitbuffer {
     constructor(bytes?: any[], len?: number)
     bytes: any[]
@@ -162,5 +162,12 @@ declare module 'pulseplot/lib/bitbuffer.js' {
     pushBreak(): void
     toBitArray(): number[]
     toHexString(): string
+  }
+}
+
+declare module "pulseplot/lib/rfraw" {
+  export class RfRaw {
+    static getPulses(value: string): number[]
+    static isRfRaw(data: string): boolean
   }
 }

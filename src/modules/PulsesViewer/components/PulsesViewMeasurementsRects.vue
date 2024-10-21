@@ -40,10 +40,10 @@ function resizeHandleHandler(m: Measurement, key: "x1" | "x2", s: any) {
 }
 
 function blur(e: Event) {
-  (e.target as HTMLElement)?.blur()
+  (e.currentTarget as HTMLElement)?.blur()
 }
 function focus(e: Event) {
-  (e.target as HTMLElement)?.focus()
+  (e.currentTarget as HTMLElement)?.focus()
 }
 </script>
 

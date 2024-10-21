@@ -50,6 +50,7 @@ export class Measurement {
   p2pWidth = computed(() => this.lastPulse.value?.scaledTime - this.firstPulse.value?.scaledTime)
 
   remove() {
+    this.decoder.remove()
     this.pulses.measurements.delete(this)
   }
 

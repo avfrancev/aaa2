@@ -3,12 +3,17 @@ import type { Measurement } from "../models/Measurements"
 import type { Pulses, PulsesItem } from "../models/Pulses"
 import { curveStepAfter, line } from "d3-shape"
 
+const { currentSession, sessions } = useSessionsStore()
+const config = useConfig()
+
 const props = defineProps<{ pulses: Pulses }>()
 
 const { view } = useViewStore()
 const { ZT } = view
 
 const pulsesStore = usePulsesStore()
+
+const itemEl = ref<HTMLElement | null>(null)
 
 const genLine = line(
   (d: PulsesItem) => d.scaledTime,
@@ -21,6 +26,27 @@ const linePath = computed<string>(() => {
 })
 
 let tmpMeasurement: Measurement | null = null
+
+const isDropDownMoreOpen = ref(false)
+function copyAs(type: "RFRAW" | "JSON" | "ARRAY") {
+  switch (type) {
+    case "RFRAW":{
+      console.log("RFRAW")
+      break
+    }
+    case "JSON": {
+      const a = JSON.stringify(props.pulses)
+      console.log("JSON", a)
+      break
+    }
+    case "ARRAY": {
+      console.log("ARRAY")
+      break
+    }
+    default:
+      break
+  }
+}
 
 function onItemDrag(s: any) {
   if (s.altKey) {
@@ -51,33 +77,84 @@ function onItemDrag(s: any) {
 
 <template lang="pug">
 div.relative(
-  v-hover="(s: any) => { pulses.setIsHovered(s.hovering) }"
+  ref="itemEl"
+  v-hover="(s: any) => { !isDropDownMoreOpen && pulses.setIsHovered(s.hovering) }"
   )
   //- pre {{ 20/view.ZT.k }}
   //- pre {{ pulses.isHovered }}
-  .h-8
-    .actions(v-show="pulses.isHovered.value")
-      button.btn.btn-sm(class="hover:btn-error" @click="pulsesStore.remove(props.pulses)") X
-      AlertDialogRoot
+  .h-10
+    .actions.mt-2.relative(
+      v-show="pulses.isHovered.value"
+      class="join *:btn *:btn-sm *:text-md")
+      button.join-item.btn-square
+        i-ph:dots-six-vertical-bold
+      PulsesViewEditPulsesDialog(
+        :model-value="props.pulses.raw_data"
+        @update:model-value="props.pulses.setRawData($event)"
+        )
+        button(class="join-item btn-square")
+          i-ph:pencil-simple
+
+      DropdownMenuRoot(v-model:open="isDropDownMoreOpen" :default-open="false")
+        DropdownMenuTrigger.btn-square.join-item
+          i-ph:dots-three-outline-fill
+        DropdownMenuPortal
+          DropdownMenuContent.DropdownMenuContent
+            DropdownMenuArrow(class="fill-base-300")
+            DropdownMenuItem.DropdownMenuItem(:disabled="pulses.xOffset.value === 0" @click="pulses.setXOffset(0)")
+              i-ph:align-left-simple-fill.mr-2
+              | Reset offset
+            DropdownMenuSub
+              DropdownMenuSubTrigger.DropdownMenuItem(value="more copy")
+                i-ph:align-left-simple-fill.mr-2
+                | Copy to
+                DropdownMenuPortal
+                  DropdownMenuSubContent.DropdownMenuContent
+                    DropdownMenuItem.DropdownMenuItem(
+                      v-if="config.useESP32 && currentSession !== 'ESP32'"
+                      @click="copyToSession('ESP32', pulses.toJSON())"
+                      ) ESP32
+                    DropdownMenuItem.DropdownMenuItem(
+                      v-for="s in [...sessions].filter(s => s !== currentSession)"
+                      :key="s"
+                      @click="copyToSession(s, pulses.toJSON())"
+                      ) {{ s }}
+                      //- @click="console.log(pulses.toJSON())"
+            DropdownMenuSub
+              DropdownMenuSubTrigger.DropdownMenuItem(value="more copy")
+                i-ph:align-left-simple-fill.mr-2
+                | Copy as
+                DropdownMenuPortal
+                  DropdownMenuSubContent.DropdownMenuContent
+                    DropdownMenuItem.DropdownMenuItem(@click="copyAs('RFRAW')")
+                      | RFRaw
+                    DropdownMenuItem.DropdownMenuItem(@click="copyAs('JSON')")
+                      | JSON
+                    DropdownMenuItem.DropdownMenuItem(@click="copyAs('ARRAY')")
+                      | Array
+            DropdownMenuItem.DropdownMenuItem(
+              @click="pulses.addMeasurement(pulses.data.value.at(0)?.time || 0, pulses.data.value.at(-1)?.time || 0)"
+              )
+              i-ph:brackets-square-duotone.mr-2
+              | Measure all
+            DropdownMenuItem.DropdownMenuItem(class="hover:bg-error hover:text-error-content" @click="pulsesStore.remove(props.pulses)")
+              i-ph:trash.mr-2
+              | Delete
+        //- @update:model-value="props.pulses.setRawData($event)"
+      //- pre asdasd
+
+      //- AlertDialogRoot()
         AlertDialogTrigger(class="btn btn-sm btn-ghost")
-          //- button.btn.btn-sm(class="hover:btn-error")
-          i-ph:airplay-light
-        AlertDialogPortal
-          AlertDialogOverlay(class="DialogOverlay")
-          AlertDialogContent(class="DialogContent")
-            AlertDialogTitle.text-xl.my-3 Delete pulses
-            AlertDialogDescription Really delete pulses?
-            div(class="flex justify-end gap-[25px]")
-              AlertDialogCancel(class="btn btn-sm btn-ghost") Cancel
-              AlertDialogAction(class="btn btn-sm btn-error" @click="pulsesStore.remove(props.pulses)") Delete
-      DialogRoot
-        DialogTrigger(class="btn btn-sm btn-ghost")
           i-ph:ambulance-light
-        DialogPortal
-        DialogOverlay(class="DialogOverlay")
-        DialogContent(class="DialogContent")
-          //- div {{props.pulses.le}}
-          DialogClose(class="btn btn-sm btn-ghost") Close
+        AlertDialogPortal
+        AlertDialogOverlay(class="DialogOverlay")
+        AlertDialogContent(class="DialogContent" @escape-key-down="cancelSave")
+          AlertDialogTitle ASDASD
+          AlertDialogDescription Description
+          textarea.textarea(v-model.lazy="tmpRawPulsesData")
+          div(class="flex justify-end items-center gap-6")
+            AlertDialogCancel(class="btn btn-xs btn-ghost" @click="cancelSave") Cancel
+            AlertDialogAction(class="btn btn-sm btn-success" @click="save") Save
 
   //- pre {{ props.pulses.viewBox }}
   svg.w-full(

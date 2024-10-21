@@ -25,6 +25,9 @@ div(class="flex my-4 items-center overflow-x-auto")
     button.join-item.btn.btn-sms.text-lg.btn-square(@click="fullscreen.toggle()")
       i-mingcute:fullscreen-fill(v-if="!fullscreen.isFullscreen.value")
       i-mingcute:fullscreen-exit-fill(v-else)
+    a.join-item.btn.btn-sms.text-lg.btn-square(href="https://github.com/avfrancev/pulseviewer" target="_blank")
+      i-ph:github-logo-fill
+    button.join-item.btn.text-xl ?
   //- .flex.gap-2.text-center
     .size-12.bg-primary.text-primary-content.flex.items-center.justify-center
       .size-8.bg-secondary.text-secondary-content OO
