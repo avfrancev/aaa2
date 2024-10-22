@@ -70,9 +70,8 @@ AlertDialogRoot
     AlertDialogOverlay(class="DialogOverlay")
     AlertDialogContent(class="DialogContent flex flex-col" @escape-key-down="cancelSave")
       AlertDialogTitle.mb-2: b {{ title }}
-      AlertDialogDescription(class="text-muted text-sm") Description Description Description Description
+      AlertDialogDescription(class="text-muted text-sm")
       //- p(v-if="RfRaw.isRfRaw(tmp)") {{ RfRaw.getPulses(tmp) }}
-      p {{ parsed?.pulses.length }}
       textarea.textarea.w-full.my-4(
         ref="textareaEl"
         v-model="tmp"
@@ -80,6 +79,7 @@ AlertDialogRoot
         class="h-[400px]"
         :class="parsed ? 'textarea-success' : 'textarea-error'")
       div(class="flex justify-end items-center gap-6")
+        div.text-muted.mr-auto Total pulses: {{ parsed?.pulses.length }}
         AlertDialogCancel(class="btn btn-xs btn-ghost" @click="cancelSave") Cancel
         AlertDialogAction(
           class="btn btn-sm btn-success font-bold"
