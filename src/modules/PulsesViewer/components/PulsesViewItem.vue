@@ -111,14 +111,14 @@ div.relative(
                 DropdownMenuPortal
                   DropdownMenuSubContent.DropdownMenuContent
                     DropdownMenuItem.DropdownMenuItem(
-                      v-if="config.useESP32 && currentSession !== 'ESP32'"
+                      v-if="config.useESP32"
                       @click="copyToSession('ESP32', pulses.toJSON())"
-                      ) ESP32
+                      ) {{ currentSession === "ESP32" ? "Current" : "ESP32" }}
                     DropdownMenuItem.DropdownMenuItem(
-                      v-for="s in [...sessions].filter(s => s !== currentSession)"
+                      v-for="(s, id) in sessions"
                       :key="s"
                       @click="copyToSession(s, pulses.toJSON())"
-                      ) {{ s }}
+                      ) {{ currentSession === s ? "Current" : `Session #${id + 1}` }}
                       //- @click="console.log(pulses.toJSON())"
             DropdownMenuSub
               DropdownMenuSubTrigger.DropdownMenuItem(value="more copy")

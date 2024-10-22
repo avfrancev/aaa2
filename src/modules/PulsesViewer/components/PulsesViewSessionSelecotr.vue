@@ -2,12 +2,12 @@
 const { currentSession, sessions, addSession, removeSession: _removeSession } = useSessionsStore()
 const config = useConfig()
 
-const sessionsSorted = computed(() => {
-  if (config.useESP32)
-    return new Set(["ESP32", ...sessions.value])
-  else
-    return sessions.value
-})
+// const sessionsSorted = computed(() => {
+//   if (config.useESP32)
+//     return new Set(["ESP32", ...sessions.value])
+//   else
+//     return sessions.value
+// })
 
 function removeSession(session: string) {
   _removeSession(session)
@@ -37,22 +37,28 @@ SelectRoot(v-model="currentSession" )
       SelectViewport(class="relative p-[5px]")
         SelectGroup(class="relative")
           SelectItem(
-            v-for="(option, index) in sessionsSorted"
+            v-if="config.useESP32"
+            class="SelectItem"
+            value="ESP32")
+            SelectItemIndicator(class="absolute left-0 inline-flex items-center justify-center w-[25px]")
+              i-radix-icons:check
+            SelectItemText ESP32
+          SelectItem(
+            v-for="(option, index) in sessions"
             :key="option"
             class="SelectItem"
             :value="option")
             SelectItemIndicator(class="absolute left-0 inline-flex items-center justify-center w-[25px]")
               i-radix-icons:check
-            SelectItemText {{ option === "ESP32" ? "ESP32" : `Session #${index + 1}` }}
+            SelectItemText {{ `Session #${index + 1}` }}
           div(class="absolute top-0 right-0")
+            div(v-if="config.useESP32" class="h-8")
             div(
-              v-for="session in sessionsSorted"
-              :key="session")
-              div(v-if="session === 'ESP32' && config.useESP32" class="h-8")
+              v-for="s in sessions"
+              :key="s")
               button(
-                v-else
                 class="btn btn-xs my-1 text-xs btn-square btn-ghost hover:bg-error hover:text-error-content"
-                @click="removeSession(session)")
+                @click="removeSession(s)")
                 i-ph:x
           button(class="btn btn-xs btn-block btn-ghost" @click="currentSession = addSession()")
             i-ph:plus(class="text-xs")
