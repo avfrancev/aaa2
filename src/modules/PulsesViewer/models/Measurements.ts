@@ -1,22 +1,23 @@
-import type { Pulses } from './Pulses'
-import { getRandomNotUsedColor } from '~/stores/colors'
+import type { Pulses } from "./Pulses"
+import { getRandomNotUsedColor } from "~/stores/colors"
 // import { EffectScope, ShallowReactive } from "vue"
 // import { IAnalyzerWorkerArgs, IAnalyzerWorkerResult } from "../workers/analyzerWorker"
-import { v4 } from 'uuid'
-import { Decoder } from './MeasurementDecoders'
+import { v4 } from "uuid"
+import { Decoder } from "./MeasurementDecoders"
 // import { Decoder } from "./MeasurementDecoders"
 // import { PulsesStore } from "../store"
 
-export type MeasurementStorage = ReturnType<Measurement['toJSON']>
+export type MeasurementStorage = ReturnType<Measurement["toJSON"]>
 
 export class Measurement {
   id = v4()
   x1 = ref(0)
   x2 = ref(0)
-  color = ref('#000000')
+  color = ref("#000000")
   isHovered = ref(false)
   isSelected = ref(false)
-  rectRef = ref<Element | ComponentPublicInstance>()
+  rectRef = ref<Element | ComponentPublicInstance | null>()
+  metaRef = ref<Element | ComponentPublicInstance | null>()
   decoder = <Decoder>{}
   constructor(
     public pulses: Pulses,
@@ -56,6 +57,32 @@ export class Measurement {
 
   changeColor() {
     this.color.value = getRandomNotUsedColor()
+  }
+
+  locateMetaRef() {
+    if (this.metaRef.value !== null && this.metaRef.value !== undefined) {
+      if (this.metaRef.value instanceof Element) {
+        setTimeout(() => (this.metaRef.value as Element)?.scrollIntoView({ block: "center" }), 300)
+      }
+    }
+  }
+
+  locateRectRef() {
+    const w = this.scaledMaxX.value - this.scaledMinX.value
+    const zoomIdentity = new ZoomTransform(1, 0, 0)
+    const view = this.pulses.view
+    const fullWidth = view.elBounds.width.value
+    const z = zoomIdentity.scale((fullWidth / w) * 0.9)
+    let newX = -((this.scaledMinX.value - (w * 0.1) / 2) * z.k)
+    newX -= this.pulses.pulsesStore.xScale.value(this.pulses.xOffset.value + this.pulses.pulsesStore.minX.value) * z.k
+    view.animateTo({ k: z.k, x: newX })
+    
+    if (this.rectRef.value !== null && this.rectRef.value !== undefined) {
+      if (this.rectRef.value instanceof Element) {
+        const el = this.rectRef.value as Element
+        setTimeout(() => el?.scrollIntoView({ block: "center" }), 300)
+      }
+    }
   }
 
   toJSON() {

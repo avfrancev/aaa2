@@ -3,10 +3,9 @@ import type { Measurement } from "../models/Measurements"
 import type { Pulses, PulsesItem } from "../models/Pulses"
 import { curveStepAfter, line } from "d3-shape"
 
+const props = defineProps<{ pulses: Pulses }>()
 const { currentSession, sessions } = useSessionsStore()
 const config = useConfig()
-
-const props = defineProps<{ pulses: Pulses }>()
 
 const { view } = useViewStore()
 const { ZT } = view
@@ -48,6 +47,7 @@ function copyAs(type: "RFRAW" | "JSON" | "ARRAY") {
   }
 }
 
+// eslint-disable-next-line ts/no-explicit-any
 function onItemDrag(s: any) {
   if (s.altKey) {
     s.event.stopImmediatePropagation()
@@ -64,6 +64,7 @@ function onItemDrag(s: any) {
     if (s.first) {
       // props.pulses.addMeasurement(x, x) ?????
       tmpMeasurement = props.pulses.addMeasurement(x, x)
+      tmpMeasurement.isHovered.value = true
     }
     else if (tmpMeasurement) {
       tmpMeasurement.x2.value += dx
@@ -96,7 +97,7 @@ div.relative(
           i-ph:pencil-simple
         button(class="join-item btn-square hover:btn-error" @click="pulsesStore.remove(props.pulses)")
           i-ph:trash
-          
+
       DropdownMenuRoot(v-model:open="isDropDownMoreOpen" :default-open="false")
         DropdownMenuTrigger.btn-square.join-item
           i-ph:dots-three-outline-fill

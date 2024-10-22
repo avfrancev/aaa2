@@ -68,7 +68,7 @@ svg(
   @keydown.right="(e) => { let d = (pulsesStore.pixelRatio.value * 10) / ZT.k; m.x1.value += d; m.x2.value += d }"
   @keydown.delete.d="(e) => { m.remove() }"
   @keydown.c="(e) => { m.changeColor() }"
-  @keydown.space.prevent="(e) => { m.locate() }"
+  @keydown.space.prevent="(e) => { m.locateMetaRef() }"
   )
   g
     path(
