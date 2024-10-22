@@ -1,7 +1,4 @@
 <script lang="ts" setup>
-import type { MeasurementStorage } from "../models/Measurements"
-import type { PulsesStorage } from "../models/Pulses"
-import { Measurement } from "../models/Measurements"
 import sample_data from "../store/sample_data.json"
 
 const viewEl = ref()
@@ -11,7 +8,6 @@ const { view } = viewStore
 const { ZT, elBounds: { width, height } } = view
 
 const pulsesStore = usePulsesStore()
-pulsesStore.loadFromStorage()
 
 const ticksArrayString = computed<string>(() => {
   if (!pulsesStore.xScale)
@@ -23,13 +19,13 @@ const ticks = computed(() => {
   return JSON.parse(`[${ticksArrayString.value}]`) || []
 })
 
-function addRandom(l = 100, max = 1000) {
-  return {
-    raw_data: Array.from({ length: l }).map(() => +(Math.random() * max + 100).toFixed(0)),
-    xOffset: +(Math.random() * max).toFixed(0),
-    measurements: new Set(),
-  } as unknown as PulsesStorage
-}
+// function addRandom(l = 100, max = 1000) {
+//   return {
+//     raw_data: Array.from({ length: l }).map(() => +(Math.random() * max + 100).toFixed(0)),
+//     xOffset: +(Math.random() * max).toFixed(0),
+//     measurements: new Set(),
+//   } as unknown as PulsesStorage
+// }
 </script>
 
 <template lang="pug">
@@ -51,29 +47,20 @@ div(class="flex flex-col h-full")
         | Add
     AlertDialogRoot
       AlertDialogTrigger(class="join-item hover:btn-error")
-        //- button.join-item.btn.btn-square(class="hover:btn-error" @click="pulsesStore.removeAll()")
-        //- button(class="join-item btn btn-sm btn-ghost")
         i-ph:trash
         | Clear
-      //- AlertDialogPortal
+      AlertDialogPortal
         AlertDialogOverlay(class="DialogOverlay")
-        AlertDialogContent(class="DialogContent flex flex-col" @escape-key-down="cancelSave")
-          AlertDialogTitle.mb-2: b {{ title }}
-          AlertDialogDescription(class="text-muted text-sm") Description Description Description Description
+        AlertDialogContent(class="DialogContent flex flex-col")
+          AlertDialogTitle.mb-2: b Clear all
+          AlertDialogDescription(class="text-muted text-sm") Do you really want to clear all pulses?
           //- p(v-if="RfRaw.isRfRaw(tmp)") {{ RfRaw.getPulses(tmp) }}
-          p {{ parsed?.pulses.length }}
-          textarea.textarea.w-full.my-4(
-            ref="textareaEl"
-            v-model="tmp"
-            placeholder="AA B1 03 00C8 02DA 1D2E 28190909090908181909081818181908190909090819081818 55"
-            class="h-[400px]"
-            :class="parsed ? 'textarea-success' : 'textarea-error'")
           div(class="flex justify-end items-center gap-6")
-            AlertDialogCancel(class="btn btn-xs btn-ghost" @click="cancelSave") Cancel
+            AlertDialogCancel(class="btn btn-xs btn-ghost") Cancel
             AlertDialogAction(
-              class="btn btn-sm btn-success font-bold"
-              :disabled="!parsed"
-              @click="save") Save
+              class="btn btn-sm btn-error font-bold"
+              @click="pulsesStore.removeAll()") Remove all
+              //- @click="console.log(pulsesStore, pulsesStore.add)") Remove all
 
   div(
     ref="viewEl"
