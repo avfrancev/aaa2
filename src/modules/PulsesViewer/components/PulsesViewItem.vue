@@ -94,7 +94,9 @@ div.relative(
         )
         button(class="join-item btn-square")
           i-ph:pencil-simple
-
+        button(class="join-item btn-square hover:btn-error" @click="pulsesStore.remove(props.pulses)")
+          i-ph:trash
+          
       DropdownMenuRoot(v-model:open="isDropDownMoreOpen" :default-open="false")
         DropdownMenuTrigger.btn-square.join-item
           i-ph:dots-three-outline-fill

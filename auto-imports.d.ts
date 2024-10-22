@@ -72,6 +72,7 @@ declare global {
   const isReadonly: typeof import('vue')['isReadonly']
   const isRef: typeof import('vue')['isRef']
   const lightColors: typeof import('./src/stores/colors')['lightColors']
+  const loadSamplePulses: typeof import('./src/modules/PulsesViewer/store/pulses.store')['loadSamplePulses']
   const lookup: typeof import('./node_modules/pulseplot/lib/utils.js')['lookup']
   const makeDestructurable: typeof import('@vueuse/core')['makeDestructurable']
   const markRaw: typeof import('vue')['markRaw']
@@ -398,6 +399,7 @@ declare module 'vue' {
     readonly isReactive: UnwrapRef<typeof import('vue')['isReactive']>
     readonly isReadonly: UnwrapRef<typeof import('vue')['isReadonly']>
     readonly isRef: UnwrapRef<typeof import('vue')['isRef']>
+    readonly loadSamplePulses: UnwrapRef<typeof import('./src/modules/PulsesViewer/store/pulses.store')['loadSamplePulses']>
     readonly makeDestructurable: UnwrapRef<typeof import('@vueuse/core')['makeDestructurable']>
     readonly markRaw: UnwrapRef<typeof import('vue')['markRaw']>
     readonly measureText: UnwrapRef<typeof import('./src/utils')['measureText']>

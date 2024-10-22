@@ -5,6 +5,8 @@ import { Pulses } from "../models/Pulses"
 import { max, min } from "d3-array"
 import { scaleLinear, type ScaleLinear } from "d3-scale"
 
+import sample_data from "../store/sample_data.json"
+
 export class PulsesStore {
   key = ref("")
   data = shallowReactive(new Set<Pulses>())
@@ -109,4 +111,11 @@ export function copyToSession(s: string, pulses: PulsesStorage) {
   ps.loadFromStorage()
   ps.add(pulses)
   ps.saveToStorage()
+}
+
+export function loadSamplePulses() {
+  const ps = usePulsesStore()
+  for (const p of sample_data) {
+    ps.add(p)
+  }
 }

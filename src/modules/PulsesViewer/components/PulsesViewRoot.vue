@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import sample_data from "../store/sample_data.json"
-
 const viewEl = ref()
 const viewStore = useViewStore()
 viewStore.init(viewEl)
@@ -18,24 +16,11 @@ const ticksArrayString = computed<string>(() => {
 const ticks = computed(() => {
   return JSON.parse(`[${ticksArrayString.value}]`) || []
 })
-
-// function addRandom(l = 100, max = 1000) {
-//   return {
-//     raw_data: Array.from({ length: l }).map(() => +(Math.random() * max + 100).toFixed(0)),
-//     xOffset: +(Math.random() * max).toFixed(0),
-//     measurements: new Set(),
-//   } as unknown as PulsesStorage
-// }
 </script>
 
 <template lang="pug">
 div(class="flex flex-col h-full")
-  //- pre {{ ZT }}
-  //- pre >>> {{ getPulsesStore()?.data.size }}
   .join.mb-4(class="*:btn *:btn-sm ")
-    //- button.btn(@click="pulsesStore?.add(addRandom())") Add rand pulses
-    //- button.btn.btn-sm(class="hover:btn-error" @click="pulsesStore.removeAll()") remove all
-    //- v-model="tmpRawPulsesData"
     PulsesViewEditPulsesDialog(
       :model-value="[]"
       title="Create new pulses"
@@ -60,7 +45,6 @@ div(class="flex flex-col h-full")
             AlertDialogAction(
               class="btn btn-sm btn-error font-bold"
               @click="pulsesStore.removeAll()") Remove all
-              //- @click="console.log(pulsesStore, pulsesStore.add)") Remove all
 
   div(
     ref="viewEl"
@@ -79,21 +63,14 @@ div(class="flex flex-col h-full")
         button(class="btn")
           | Create new pulses
       div(class="divider divider-horizontal h-[100px] self-center") OR
-      button.btn(@click="pulsesStore?.add(sample_data[Math.floor(Math.random() * sample_data.length)])") Add sample pulses
+      button.btn(@click="loadSamplePulses()") Add sample pulses
 
     div(v-else)
-      //- pre(
-        v-for="p in pulsesStore.data"
-        :key="p.id"
-        ) {{ p.id }}
       PulsesViewItem(
         v-for="p in pulsesStore.data"
         :key="p.id"
         v-bind="{ pulses: p }"
         )
-      //- pre {{ state }}
-      //- pre {{ height }} {{ width }}
-      //- pre {{ticksArrayString}}
       svg(
         class="w-full absolute inset-0 pointer-events-none select-none touch-none -z-10 overflow-hidden fill-slate-700/30"
         :viewBox="`${view.viewportLeft.value} 0 ${view.viewportWidth.value} ${height}`"
