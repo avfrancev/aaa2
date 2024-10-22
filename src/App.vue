@@ -5,9 +5,8 @@
 <template lang="pug">
 //- main(class="container mx-auto px-2 min-h-svh grid")
 main(class="container mx-auto px-2 min-h-svh flex flex-col max-sm:max-w-[100svw]")
-  .flex.flex-col.flex-1
-    Navbar
-    PulsesViewer.flex-1
+  Navbar
+  PulsesViewer
 </template>
 
 <style lang="sass">

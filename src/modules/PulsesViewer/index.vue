@@ -3,5 +3,5 @@
 </script>
 
 <template lang="pug">
-PulsesViewRoot.flex-1
+PulsesViewRoot
 </template>

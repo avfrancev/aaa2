@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Measurement } from "../models/Measurements"
-import { extent } from "d3-array"
+import { extent, mean, quantile } from "d3-array"
 
 const config = useConfig()
 
@@ -11,9 +11,13 @@ const pulsesInRange = computed(() => m.value.pulses.data.value.slice(...m.value.
 const Nfalling = computed(() => pulsesInRange.value.filter(p => p.level).length)
 const Nrising = computed(() => pulsesInRange.value.filter(p => !p.level).length)
 const minmaxFreq = computed(() => extent(pulsesInRange.value, d => d.width))
-// averageTime: computed(() => m.pulsesInRange.reduce((acc, curr) => acc + curr.width, 0) / m.pulsesInRange.length),
-// q: computed(() => quantile( m.pulsesInRange.map((d) => d.width), 0.05 ) ),
-// baud: computed(() => Math.floor(((1 / m.q) * 1000 * 1000))),
+// const averageTime = computed(() => pulsesInRange.value.reduce((acc, curr) => acc + curr.width, 0) / m.pulsesInRange.length)
+// const averageTime = computed(() => mean(pulsesInRange.value, d => d.width))
+const q = computed(() => quantile(pulsesInRange.value, 0.05, d => d.width))
+const baud = computed(() => {
+  if (!q.value) return "---"
+  return Math.floor(((1 / (q.value || 1)) * 1000 * 1000))
+})
 </script>
 
 <template lang="pug">
@@ -21,7 +25,7 @@ const minmaxFreq = computed(() => extent(pulsesInRange.value, d => d.width))
 div(
   :ref="el => { if (el) m.metaRef.value = el }"
   v-hover="(s: any) => m.isHovered.value = s.hovering"
-  class="flex flex-col gap-2 text-sm box-border p-3 py-3 rounded bg-base-300/90 backdrop-blur transition-all duration-200"
+  class="flex flex-col gap-2 text-sm box-border p-3 py-3 rounded bg-base-300/80 backdrop-blur transition-[box-shadow,colors] duration-200"
   :class="[m.isHovered.value && 'ring ring-secondary/50', m.isSelected.value && 'ring ring-accent/50', config.pinMeasurements && 'shadow-lg']"
   )
   div(class="flex items-baseline space-x-3")
@@ -43,9 +47,9 @@ div(
     pre: b {{ minmaxFreq[0] }} µs
     pre #[i &#402;]#[sub max]
     pre: b {{ minmaxFreq[1] }} µs
-    //- //- pre {{ averageTime }}
-    //- pre #[i &#402;]#[sub baud]
-    //- pre: b {{baud}}
+    //- pre {{ averageTime }}
+    pre #[i &#402;]#[sub baud]
+    pre: b {{ baud }}
 
   div(class="join flex mt-2")
     button(class="join-item btn-xs btn flex-1" @click="m.locateRectRef")
