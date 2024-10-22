@@ -102,5 +102,7 @@ export const usePulsesStore = createGlobalState(() => {
 export function copyToSession(s: string, pulses: PulsesStorage) {
   // console.warn("copyToSession", s, "not implemented")
   const ps = new PulsesStore(s)
+  ps.loadFromStorage()
   ps.add(pulses)
+  ps.saveToStorage()
 }
