@@ -1,6 +1,7 @@
-import type { MaybeComputedElementRef } from '@vueuse/core'
-import type { IView, IViewConstrains } from '~/composables/usePanZoom'
-import { ZoomTransform } from '~/composables/usePanZoom'
+import type { MaybeComputedElementRef } from "@vueuse/core"
+import type { PulsesStore } from "./pulses.store"
+import type { IView, IViewConstrains } from "~/composables/usePanZoom"
+import { ZoomTransform } from "~/composables/usePanZoom"
 
 export function createViewStore(el: MaybeComputedElementRef = ref(), ZT?: ZoomTransform): IView {
   const elBounds = useElementBounding(computed(() => toValue(el)))
@@ -44,5 +45,15 @@ export const useViewStore = createGlobalState(() => {
       viewEl.value = toValue(el)
     })
   }
-  return { view, init }
+  function calculateMaxScaleConstraints(pulsesStore: PulsesStore, divider: number) {
+    const minPulseWidth = pulsesStore.minPulseWidth.value
+    const domain = pulsesStore.xScale.value.domain()
+    const fullWidth = domain[1] - domain[0]
+    return fullWidth / minPulseWidth / divider
+  }
+  function setScaleConstraints(pulsesStore: PulsesStore, divider: number = 10) {
+    view.extents.scaleConstraints[1] = calculateMaxScaleConstraints(pulsesStore, divider)
+  }
+  return { view, init, setScaleConstraints }
 })
+

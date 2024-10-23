@@ -16,6 +16,10 @@ function onPulsesSave(val: IParsedPulses) {
       pulsesStore.add(val.data)
   }
 }
+
+watchEffect(() => {
+  viewStore.setScaleConstraints(pulsesStore)
+})
 </script>
 
 <template lang="pug">

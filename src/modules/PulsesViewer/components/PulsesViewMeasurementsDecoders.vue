@@ -13,7 +13,7 @@ const isRootVisible = useElementVisibility(useCurrentElement())
 const hintsGroups = computed(() => {
   const arr = [] as HintsGroups[]
   for (const m of props.pulses.measurements) {
-    if (m.decoder.state.sliceGuess)
+    if (m.decoder.state.sliceGuess?.hintsGroups)
       arr.push(m.decoder.state.sliceGuess.hintsGroups)
   }
   return arr
@@ -21,7 +21,7 @@ const hintsGroups = computed(() => {
 
 const hintsBytesFiltered = computed(() => {
   return hintsGroups.value.flatMap((m) => {
-    return m.flatMap((g) => {
+    return m?.flatMap((g) => {
       const bytes = []
       for (const h of g.bytes) {
         // const eh: (typeof h) & { bitsFiltered: Hint[] } = h

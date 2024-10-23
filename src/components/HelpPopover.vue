@@ -25,6 +25,8 @@ PopoverRoot
         span #[kbd ←] or #[kbd →] move measurement
       .shortcut
         span #[kbd alt] + #[kbd drag resize handler] snap to pulses
+      .shortcut
+        span #[kbd space] scroll to measurement card
 </template>
 
 <style lang="sass" scoped>

@@ -7,7 +7,6 @@
 
 const isDark = useDark()
 const toggleDark = useToggle(isDark)
-const fullscreen = useFullscreen()
 </script>
 
 <template lang="pug">
@@ -20,9 +19,6 @@ div(class="flex my-4 items-center overflow-x-auto")
     button.join-item.btn.btn-sms.text-lg.btn-square(@click="toggleDark()")
       i-carbon:moon(v-if="!isDark")
       i-carbon:sun(v-else)
-    button.join-item.btn.btn-sms.text-lg.btn-square(@click="fullscreen.toggle()")
-      i-mingcute:fullscreen-fill(v-if="!fullscreen.isFullscreen.value")
-      i-mingcute:fullscreen-exit-fill(v-else)
     SettingsPopover
       button.btn.join-item.text-lg.btn-square
         i-ph:gear

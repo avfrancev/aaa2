@@ -80,7 +80,9 @@ export class Measurement {
     if (this.rectRef.value !== null && this.rectRef.value !== undefined) {
       if (this.rectRef.value instanceof Element) {
         const el = this.rectRef.value as Element
-        setTimeout(() => el?.scrollIntoView({ block: "center" }), 300)
+        window.requestAnimationFrame(() => el.scrollIntoView({ block: "center" }))
+        // el?.scrollIntoView({ block: "center" })
+        // setTimeout(() => el?.scrollIntoView({ block: "center" }), 300)
       }
     }
   }
