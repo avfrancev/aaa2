@@ -47,6 +47,11 @@ export class PulsesStore {
     }, obj)
   }
 
+  updatePulses(oldPulses: Pulses, pulses: Partial<PulsesStorage>) {
+    this.remove(oldPulses)
+    this.add(pulses)
+  }
+
   loadFromStorage() {
     try {
       const s = window.localStorage.getItem(`pulsesStore-${this.key.value}`)

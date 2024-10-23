@@ -1,15 +1,26 @@
 <script lang="ts" setup>
+import type { IParsedPulses } from "../parserHelpers"
+
 const pulsesStore = usePulsesStore()
 const config = useConfig()
+
+function onPulsesSave(val: IParsedPulses) {
+  if (val.data && typeof val.data === "object") {
+    if (val.type === FormatType[FormatType.Array] || val.type === FormatType[FormatType.RfRaw])
+      pulsesStore.add({ raw_data: val.data as number[] })
+    else if (val.type === FormatType[FormatType.Json] && "raw_data" in val.data)
+      pulsesStore.add(val.data)
+  }
+}
 </script>
 
 <template lang="pug">
 .join.mb-4(class="*:btn-sm ")
   PulsesViewEditPulsesDialog(
-    :model-value="[]"
+    value=""
     title="Create new pulses"
     :clear-on-save="true"
-    @update:model-value="pulsesStore.add({ raw_data: $event })"
+    @save="onPulsesSave"
     )
     button(class="join-item btn hover:btn-info")
       i-ph:file-plus-bold
@@ -30,9 +41,9 @@ const config = useConfig()
             class="btn btn-sm btn-error font-bold"
             @click="pulsesStore.removeAll()") Remove all
   button(
-    @click="config.pinMeasurements = !config.pinMeasurements"
     class="join-item btn"
-    :class="[config.pinMeasurements && 'btn-active bg-opacity-100']")
+    :class="[config.pinMeasurements && 'btn-active bg-opacity-100']"
+    @click="config.pinMeasurements = !config.pinMeasurements")
     i-clarity:pinned-solid
     | Pin measurements
 </template>

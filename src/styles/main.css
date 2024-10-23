@@ -46,7 +46,7 @@
     @apply z-[100] data-[state=open]:animate-contentShow fixed top-[50%] left-[50%] max-h-[85vh] w-[95vw] max-w-3xl translate-x-[-50%] translate-y-[-50%] rounded bg-base-300 p-4 shadow-2xl focus:outline-none
   }
   .DropdownMenuContent {
-    @apply min-w-[100px] outline-none bg-base-300 rounded-md p-[5px] shadow-lg will-change-[opacity,transform] data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade;
+    @apply z-[100] min-w-[100px] outline-none bg-base-300 rounded-md p-[5px] shadow-lg will-change-[opacity,transform] data-[side=top]:animate-slideDownAndFade data-[side=right]:animate-slideLeftAndFade data-[side=bottom]:animate-slideUpAndFade data-[side=left]:animate-slideRightAndFade;
   }
   .DropdownMenuItem {
     @apply leading-none text-base-content rounded-[3px] flex items-center p-2 text-xs relative select-none outline-none data-[disabled]:text-muted data-[disabled]:pointer-events-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-content

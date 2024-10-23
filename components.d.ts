@@ -52,6 +52,7 @@ declare module 'vue' {
     'IPh:ambulanceLight': typeof import('~icons/ph/ambulance-light')['default']
     'IPh:bracketsSquareBold': typeof import('~icons/ph/brackets-square-bold')['default']
     'IPh:bracketsSquareDuotone': typeof import('~icons/ph/brackets-square-duotone')['default']
+    'IPh:checkCircleBold': typeof import('~icons/ph/check-circle-bold')['default']
     'IPh:dotsMore': typeof import('~icons/ph/dots-more')['default']
     'IPh:dotsSixVertical': typeof import('~icons/ph/dots-six-vertical')['default']
     'IPh:dotsSixVerticalBold': typeof import('~icons/ph/dots-six-vertical-bold')['default']

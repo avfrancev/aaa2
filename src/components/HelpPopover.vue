@@ -24,7 +24,7 @@ PopoverRoot
       .shortcut
         span #[kbd ←] or #[kbd →] move measurement
       .shortcut
-        span #[kbd alt] + #[kbd drag resize handler] stick to pulses
+        span #[kbd alt] + #[kbd drag resize handler] snap to pulses
 </template>
 
 <style lang="sass" scoped>

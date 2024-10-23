@@ -1,60 +1,52 @@
 <script lang="ts" setup>
-import { RfRaw } from "pulseplot/lib/rfraw"
+import type { PulsesStorage } from "../models/Pulses"
+import type { IParsedPulses } from "../parserHelpers"
 
-const { title = "Edit pulses", clearOnSave = false } = defineProps<{ title?: string, clearOnSave?: boolean }>()
+const { value, title = "Edit pulses", clearOnSave = false } = defineProps<{ value: string, title?: string, clearOnSave?: boolean }>()
 
-const [model] = defineModel<number[]>({ default: [] })
+const emit = defineEmits<{
+  save: [data: IParsedPulses]
+}>()
 
-const tmp = ref(model.value.toString())
+const tmp = ref(value)
 
 function cancelSave() {
-  tmp.value = model.value.toString()
+  tmp.value = value
 }
 
 const textareaEl = ref<HTMLTextAreaElement>()
 useFocus(textareaEl, { initialValue: true })
 
-enum FormatType {
-  unknown,
-  RfRaw,
-  Array,
-}
+const parsed = ref<IParsedPulses>()
 
-function getFromRFRaw(s: string) {
-  if (!RfRaw.isRfRaw(s))
-    return
-  return RfRaw.getPulses(s)
-}
-
-const parsed = computed(() => {
-  let res: { type: FormatType, pulses: number[] } | undefined
-  let p = getFromRFRaw(tmp.value)
-
-  if (p && p.filter(Boolean).length) {
-    // AA B1 03 00C8 02DA 1D2E 28190909090908181909081818181908190909090819081818 55
-    res = {
-      type: FormatType.RfRaw,
-      pulses: p,
+watchEffect(() => {
+  const p = getParsedInputString(tmp.value)
+  if (p) {
+    if (p.type === FormatType[FormatType.Array] || p.type === FormatType[FormatType.RfRaw]) {
+      if ((p.data as number[])?.at(-1) !== 0)
+        (p?.data as number[])?.push(0)
+    }
+    else if (p.type === FormatType[FormatType.Json]) {
+      if ((p.data as Partial<PulsesStorage>)?.raw_data?.at(-1) !== 0)
+        (p?.data as Partial<PulsesStorage>)?.raw_data?.push(0)
     }
   }
-
-  p = tmp.value.split(",").map(Number).filter(Boolean)
-  if (Array.isArray(p) && p.length) {
-    res = {
-      type: FormatType.Array,
-      pulses: p,
-    }
-  }
-  if (res && res.pulses.at(-1) !== 0)
-    res.pulses.push(0)
-  return res
+  parsed.value = p as IParsedPulses
 })
 
+const totalPulses = computed(() => {
+  if (parsed.value === undefined)
+    return undefined
+  if (parsed.value.type === FormatType[FormatType.Array] || parsed.value.type === FormatType[FormatType.RfRaw])
+    return (parsed.value?.data as number[])?.length
+  if (parsed.value.type === FormatType[FormatType.Json])
+    return (parsed.value?.data as Partial<PulsesStorage>)?.raw_data?.length
+  return undefined
+})
 
 function save() {
   if (parsed.value) {
-    // console.log(parsed.value.pulses);
-    model.value = parsed.value.pulses
+    emit("save", parsed.value)
     clearOnSave && (tmp.value = "")
   }
 }
@@ -71,7 +63,6 @@ AlertDialogRoot
     AlertDialogContent(class="DialogContent flex flex-col" @escape-key-down="cancelSave")
       AlertDialogTitle.mb-2: b {{ title }}
       AlertDialogDescription(class="text-muted text-sm")
-      //- p(v-if="RfRaw.isRfRaw(tmp)") {{ RfRaw.getPulses(tmp) }}
       textarea.textarea.w-full.my-4(
         ref="textareaEl"
         v-model="tmp"
@@ -79,7 +70,7 @@ AlertDialogRoot
         class="h-[400px]"
         :class="parsed ? 'textarea-success' : 'textarea-error'")
       div(class="flex justify-end items-center gap-6")
-        div.text-muted.mr-auto Total pulses: {{ parsed?.pulses.length }}
+        div.text-muted.mr-auto Type: {{ parsed?.type }} | Total pulses: {{ totalPulses }}
         AlertDialogCancel(class="btn btn-xs btn-ghost" @click="cancelSave") Cancel
         AlertDialogAction(
           class="btn btn-sm btn-success font-bold"
