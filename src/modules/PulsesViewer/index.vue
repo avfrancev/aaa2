@@ -3,6 +3,5 @@
 </script>
 
 <template lang="pug">
-div
-  PulsesViewRoot
+PulsesViewRoot
 </template>

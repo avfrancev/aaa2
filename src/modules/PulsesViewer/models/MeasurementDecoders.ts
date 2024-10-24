@@ -10,13 +10,17 @@ analyzerWorker.port.onmessageerror = (e) => {
   console.log("SHARED WORKER ERROR", e)
 }
 
+// export const slicers = ["PCM", "PWM", "PPM", "MC", "DM", "NRZI", "CMI", "PIWM"]
+
 export class Decoder {
+  static slicers = ["PCM", "PWM", "PPM", "MC", "DM", "NRZI", "CMI", "PIWM"]
   state = shallowReactive({
     isLoading: false,
+    pickedSlicer: null,
     analyzer: {},
     guessed: {},
-    sliceGuess: null as (IAnalyzerWorkerResult["sliceGuess"] | null),
-  } as IAnalyzerWorkerResult & { isLoading: boolean })
+    sliceGuess: {},
+  } as IAnalyzerWorkerResult & { isLoading: boolean, pickedSlicer: string | null })
 
   measurementID: string
 
@@ -33,6 +37,7 @@ export class Decoder {
         rangeIdsString.value,
         m.pulses.raw_data,
         m.xScale.domain().toString(),
+        this.state.pickedSlicer,
       ], () => {
       const args = {
         measurementID: this.measurementID,
@@ -42,7 +47,7 @@ export class Decoder {
           range: pulsesStore.xScale.value.range() as [number, number],
         },
         rangeIds: m.rangeIds.value,
-        pickedSlicer: null,
+        pickedSlicer: this.state.pickedSlicer,
         firstPulse: m.firstPulse.value,
         lastPulse: m.lastPulse.value,
       } as IAnalyzerWorkerArgs

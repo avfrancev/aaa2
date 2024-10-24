@@ -1,131 +1,78 @@
 <script lang="ts" setup>
-import sample_data from "../store/sample_data.json"
+import type { IParsedPulses } from "../parserHelpers"
 
 const viewEl = ref()
 const viewStore = useViewStore()
-viewStore.init(viewEl)
 const { view } = viewStore
-const { ZT, elBounds: { width, height } } = view
-
+viewStore.init(viewEl)
+const config = useConfig()
 const pulsesStore = usePulsesStore()
 
-const ticksArrayString = computed<string>(() => {
-  if (!pulsesStore.xScale)
-    return ""
-  return view.ZT.rescaleX(pulsesStore.xScale.value).ticks(6).toString()
-})
+function onPulsesSave(val: IParsedPulses) {
+  if (val.data && typeof val.data === "object") {
+    if (val.type === FormatType[FormatType.Array] || val.type === FormatType[FormatType.RfRaw])
+      pulsesStore.add({ raw_data: val.data as number[] })
+    else if (val.type === FormatType[FormatType.Json] && "raw_data" in val.data)
+      pulsesStore.add(val.data)
+  }
+}
 
-const ticks = computed(() => {
-  return JSON.parse(`[${ticksArrayString.value}]`) || []
+watchEffect(() => {
+  viewStore.setScaleConstraints(pulsesStore)
 })
-
-// function addRandom(l = 100, max = 1000) {
-//   return {
-//     raw_data: Array.from({ length: l }).map(() => +(Math.random() * max + 100).toFixed(0)),
-//     xOffset: +(Math.random() * max).toFixed(0),
-//     measurements: new Set(),
-//   } as unknown as PulsesStorage
-// }
 </script>
 
 <template lang="pug">
-div(class="flex flex-col h-full")
-  //- pre {{ ZT }}
-  //- pre >>> {{ getPulsesStore()?.data.size }}
-  .join.mb-4(class="*:btn *:btn-sm ")
-    //- button.btn(@click="pulsesStore?.add(addRandom())") Add rand pulses
-    //- button.btn.btn-sm(class="hover:btn-error" @click="pulsesStore.removeAll()") remove all
-    //- v-model="tmpRawPulsesData"
+PulsesViewPulsesStoreNavbar.PulsesViewPulsesStoreNavbar(
+  v-if="pulsesStore.data.size > 0"
+  class="sticky top-2 z-20 bg-base-300/80 backdrop-blur")
+
+.MeasurementsMetaWrapper(
+  v-if="pulsesStore.data.size > 0"
+  class=" inline-flex self-start max-w-full"
+  :class="config.pinMeasurements && ['sticky top-10 z-30']")
+  PulsesViewMeasurementsMeta
+
+div(
+  v-if="pulsesStore.data.size > 0"
+  class="container fixed bottom-0 px-2 -ml-2 z-10")
+  div(class="flex w-full bg-base-300 mb-4 ring-4 ring-base-300 rounded-box")
+    div(
+      v-drag="(e: any) => { view.translateBy(-e.delta[0] * view.ZT.k, 0) }"
+      class="h-2 text-xs text-secondary-content text-center rounded-box bg-base-content/20 active:ring-1 ring-base-content/50 cursor-grab active:cursor-grabbing"
+      :style="{ width: `${Math.max(view.elBounds.width.value / view.ZT.k, 10)}px`, transform: `translateX(${-view.ZT.x / view.ZT.k}px)` }")
+
+div(class="flex-1 flex flex-col h-full relative")
+
+  div(
+    v-if="pulsesStore.data.size < 1"
+    class="justify-center self-center my-auto flex-1 flex flex-col items-center sm:flex-row sm:gap-12"
+    )
     PulsesViewEditPulsesDialog(
-      :model-value="[]"
+      value=""
       title="Create new pulses"
       :clear-on-save="true"
-      @update:model-value="pulsesStore.add({ raw_data: $event })"
+      @save="onPulsesSave"
       )
-      button(class="join-item hover:btn-info")
-        i-ph:file-plus-bold
-        | Add
-    AlertDialogRoot
-      AlertDialogTrigger(class="join-item hover:btn-error")
-        i-ph:trash
-        | Clear
-      AlertDialogPortal
-        AlertDialogOverlay(class="DialogOverlay")
-        AlertDialogContent(class="DialogContent flex flex-col")
-          AlertDialogTitle.mb-2: b Clear all
-          AlertDialogDescription(class="text-muted text-sm") Do you really want to clear all pulses?
-          //- p(v-if="RfRaw.isRfRaw(tmp)") {{ RfRaw.getPulses(tmp) }}
-          div(class="flex justify-end items-center gap-6")
-            AlertDialogCancel(class="btn btn-xs btn-ghost") Cancel
-            AlertDialogAction(
-              class="btn btn-sm btn-error font-bold"
-              @click="pulsesStore.removeAll()") Remove all
-              //- @click="console.log(pulsesStore, pulsesStore.add)") Remove all
+      button(class="btn md:btn-wide")
+        | Create new pulses
+    div(class="divider sm:divider-horizontal sm:h-[100px] self-center") OR
+    button(
+      class="btn md:btn-wide"
+      @click="loadSamplePulses()") Add sample pulses
 
   div(
     ref="viewEl"
-    class="relative py-2 h-full"
+    class="viewEl mb-20"
     )
     div(
-      v-if="pulsesStore.data.size < 1"
-      class="h-full items-center justify-center flex gap-12"
+      v-if="pulsesStore.data.size > 0"
+      class=""
       )
-      PulsesViewEditPulsesDialog(
-        :model-value="[]"
-        title="Create new pulses"
-        :clear-on-save="true"
-        @update:model-value="pulsesStore.add({ raw_data: $event })"
-        )
-        button(class="btn")
-          | Create new pulses
-      div(class="divider divider-horizontal h-[100px] self-center") OR
-      button.btn(@click="pulsesStore?.add(sample_data[Math.floor(Math.random() * sample_data.length)])") Add sample pulses
-
-    div(v-else)
-      //- pre(
-        v-for="p in pulsesStore.data"
-        :key="p.id"
-        ) {{ p.id }}
       PulsesViewItem(
         v-for="p in pulsesStore.data"
         :key="p.id"
         v-bind="{ pulses: p }"
         )
-      //- pre {{ state }}
-      //- pre {{ height }} {{ width }}
-      //- pre {{ticksArrayString}}
-      svg(
-        class="w-full absolute inset-0 pointer-events-none select-none touch-none -z-10 overflow-hidden fill-slate-700/30"
-        :viewBox="`${view.viewportLeft.value} 0 ${view.viewportWidth.value} ${height}`"
-        preserveAspectRatio="none"
-        :height="height")
-        path(
-          class="stroke-base-content/50"
-          stroke-width="1"
-          stroke-dasharray="8 10"
-          :transform="`matrix(${1},0,0,1,${view.mouseX.value},0)`"
-          :d="`M ${0},0 V${height}`")
-        path(
-          class="stroke-base-content/20"
-          stroke-dasharray="8 10"
-          stroke-width="1"
-          :d="ticks.reduce((acc: string, t: number) => `${acc}M ${pulsesStore?.xScale.value(t)},0 V${height} `, '')"
-          )
-        foreignObject.pointer-events-nones(
-          :transform="`matrix(${1 / ZT.k},0,0,1,${0},0)`"
-          :width="width * ZT.k"
-          height="100"
-          )
-          div(
-            v-for="t in ticks"
-            :key="t"
-            class="absolute top-0 -translate-x-1/2 text-xs"
-            :style="`left: ${(pulsesStore?.xScale.value(t) || 0) / width * 100}%;`"
-            ) {{ t / 1000 }}
-          div(
-            :style="`transform: translate3d(${view.mouseX.value * ZT.k}px, 0, 0)`"
-            class="absolute top-0 text-xs")
-            div(
-              class="-translate-x-1/2 bg-base-300 text-base-content rounded py-1 px-1.5"
-            ) {{ pulsesStore?.xScale.value.invert(view.mouseX.value).toFixed(0) }}
+      PulsesViewTicks
 </template>

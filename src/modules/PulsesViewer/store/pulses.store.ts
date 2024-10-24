@@ -1,9 +1,12 @@
+import type { Measurement } from "../models/Measurements"
 // import { currentSession } from "./sessions.store"
 import type { PulsesStorage } from "../models/Pulses"
 import { Pulses } from "../models/Pulses"
 // import viewStore from "./view.store"
 import { max, min } from "d3-array"
+
 import { scaleLinear, type ScaleLinear } from "d3-scale"
+import sample_data from "../store/sample_data.json"
 
 export class PulsesStore {
   key = ref("")
@@ -45,6 +48,11 @@ export class PulsesStore {
     }, obj)
   }
 
+  updatePulses(oldPulses: Pulses, pulses: Partial<PulsesStorage>) {
+    this.remove(oldPulses)
+    this.add(pulses)
+  }
+
   loadFromStorage() {
     try {
       const s = window.localStorage.getItem(`pulsesStore-${this.key.value}`)
@@ -80,16 +88,37 @@ export class PulsesStore {
     this.data.clear()
     this.saveToStorage()
   }
+
+  minPulseWidth = computed(() => this.getMinPulseWidth())
+  getMinPulseWidth() {
+    let min = Infinity
+    for (const pulses of this.data) {
+      min = Math.min(min, pulses.minPulseWidth.value)
+    }
+    return min
+  }
+
+  allMeasurements = computed(() => {
+    const ms = new Set<Measurement>()
+    for (const pulses of this.data) {
+      for (const m of pulses.measurements) ms.add(m)
+    }
+    return ms
+  })
+
+  removeAllMeasurements() {
+    for (const m of this.allMeasurements.value) {
+      m.remove()
+    }
+  }
 }
 
 export const usePulsesStore = createGlobalState(() => {
   const { currentSession } = useSessionsStore()
 
   const pulsesStore = shallowReactive(new PulsesStore(currentSession.value))
-  pulsesStore.loadFromStorage()
-  // const pulsesStore = shallowReactive({} as PulsesStore)
 
-  watch(() => currentSession.value, () => {
+  watchImmediate(() => currentSession.value, () => {
     const ps = new PulsesStore(currentSession.value)
     Object.assign(pulsesStore, ps)
     // Object.assign(pulsesStore, new PulsesStore(currentSession.value))
@@ -100,9 +129,20 @@ export const usePulsesStore = createGlobalState(() => {
 })
 
 export function copyToSession(s: string, pulses: PulsesStorage) {
-  // console.warn("copyToSession", s, "not implemented")
+  const { currentSession } = useSessionsStore()
+  if (s === currentSession.value) {
+    usePulsesStore().add(pulses)
+    return
+  }
   const ps = new PulsesStore(s)
   ps.loadFromStorage()
   ps.add(pulses)
   ps.saveToStorage()
+}
+
+export function loadSamplePulses() {
+  const ps = usePulsesStore()
+  for (const p of sample_data) {
+    ps.add(p)
+  }
 }

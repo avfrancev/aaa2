@@ -1,9 +1,9 @@
-import type { PulsesItem } from '../models/Pulses'
-import { scaleLinear } from 'd3-scale'
-import { Bitbuffer } from 'pulseplot/lib/bitbuffer.js'
-import { Analyzer } from 'pulseplot/lib/histogram.js'
-import { sliceGuess } from 'pulseplot/lib/slicer.js'
-import { v4 as uuid } from 'uuid'
+import type { PulsesItem } from "../models/Pulses"
+import { scaleLinear } from "d3-scale"
+import { Bitbuffer } from "pulseplot/lib/bitbuffer.js"
+import { Analyzer } from "pulseplot/lib/histogram.js"
+import { sliceGuess } from "pulseplot/lib/slicer.js"
+import { v4 as uuid } from "uuid"
 
 export interface IAnalyzerWorkerArgs {
   measurementID: number | string
@@ -20,11 +20,13 @@ export interface IAnalyzerWorkerArgs {
 
 export interface IAnalyzerWorkerResult {
   measurementID: number | string
+  // pickedSlicer: string | null
   analyzer?: Analyzer
-  guessed?: ReturnType<Analyzer['guess']>
+  guessed?: ReturnType<Analyzer["guess"]>
   sliceGuess?: {
     hints: any[][]
     // bytesHints: IBitsHintsGroup[]
+    hex: string
     bits: Bitbuffer
     hintsGroups: HintsGroups
   }
@@ -39,7 +41,7 @@ export interface ISliceGuessResult {
 
 export type HintsGroups = ReturnType<typeof createHintsGroups>
 
-export type BitsHints = [number, number, 'X' | 'O' | '1']
+export type BitsHints = [number, number, "X" | "O" | "1"]
 export type IBitsHintsGroup = BitsHints[] & {
   // asd: number
   bbuf: Bitbuffer
@@ -62,14 +64,14 @@ export interface Hint {
 
 function splitArrayWithDelimiter<T>(arr: T[] = [], delimiterCallback: (item: T, i: number, arr: T[]) => boolean) {
   const result = [[]] as T[][]
-  arr.forEach((item, i) => {
+  for (const [i, item] of arr.entries()) {
     if (delimiterCallback(item, i, arr)) {
       result.push([item])
     }
     else {
       result[result.length - 1].push(item)
     }
-  })
+  }
   return result.filter(g => g.length)
 }
 
@@ -79,9 +81,9 @@ interface SharedWorkerGlobalScope {
 
 function toHexadecimal(num: number) {
   if (num < 0 || num > 255) {
-    return 'Error: Input must be between 0 and 255.'
+    return "Error: Input must be between 0 and 255."
   }
-  return `0x${num.toString(16).padStart(2, '0').toUpperCase()}`
+  return `0x${num.toString(16).padStart(2, "0").toUpperCase()}`
 }
 
 function createBytesHints(g: Hint[]) {
@@ -127,7 +129,7 @@ function createHintsGroups(_hints: BitsHints[], xScale: (x: number) => number, f
   const groups = splitArrayWithDelimiter(hints, (h: Hint, i: number, arr: Hint[]) => {
     const prev = arr[i - 1]
     const hasBreak = !prev || prev.x2 !== h.x1
-    return hasBreak || h.label === 'X'
+    return hasBreak || h.label === "X"
   })
   return groups.map((g) => {
     return {
@@ -173,7 +175,7 @@ _self.onconnect = (e) => {
       measurementID,
       analyzer,
       guessed,
-      sliceGuess: { ...sg, hintsGroups },
+      sliceGuess: { ...sg, hex: sg.bits?.toHexString() || "", hintsGroups },
     }
     port.postMessage(result)
   }

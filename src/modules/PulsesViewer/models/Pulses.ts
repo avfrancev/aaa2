@@ -49,6 +49,15 @@ export class Pulses {
   pulsesWidthExtent = computed(() => extent(this.raw_data))
   // get minPulseWidth() { return this.pulsesWidthExtent.value[0] }
   // get maxPulseWidth() { return this.pulsesWidthExtent.value[1] }
+  raw_dataSorted = computed(() => this.raw_data.toSorted((a, b) => a - b))
+  minPulseWidth = computed(() => {
+    for (const p of this.raw_dataSorted.value) {
+      if (p !== 0)
+        return p
+    }
+    return Infinity
+  })
+
   data = computed<PulsesItem[]>(() => {
     const startLevel = 0
     if (this.raw_data[this.raw_data.length - 1] !== 0)
@@ -99,7 +108,7 @@ export class Pulses {
       xOffset: toValue(this.xOffset),
       rssi: this.rssi,
       // measurements: Array.from(this.measurements as unknown as MeasurementStorage[]),
-      measurements: Array.from(this.measurements, (m) => m.toJSON()),
+      measurements: Array.from(this.measurements, m => m.toJSON()),
     }
   }
 }

@@ -1,9 +1,10 @@
-import { useGesture } from '@vueuse/gesture'
+import { useGesture } from "@vueuse/gesture"
 // import { animate, easeInOut, inertia } from "popmotion"
 
-import type { MaybeComputedElementRef, UseElementBoundingReturn } from '@vueuse/core'
-import type { State } from '@vueuse/gesture'
-import type { MaybeRef, ShallowReactive } from 'vue'
+import type { MaybeComputedElementRef, UseElementBoundingReturn } from "@vueuse/core"
+import type { State } from "@vueuse/gesture"
+import type { MaybeRef, ShallowReactive } from "vue"
+import { animate, easeInOut } from "popmotion"
 
 export class ZoomTransform {
   k: number
@@ -88,6 +89,7 @@ export interface IView {
   getScaleToPointX: (scaleFactor: number, p0: number) => ZoomTransform
   isRangeInView: (x1: number, x2: number) => boolean
   isPiontInView: (x: number) => boolean
+  animateTo: (to: Partial<ZoomTransform>) => void
 }
 
 function getGestures(view: IView) {
@@ -128,7 +130,7 @@ function getGestures(view: IView) {
     },
     {
       // HACK
-      domTarget: '' as MaybeRef,
+      domTarget: "" as MaybeRef,
       wheel: {
         lockDirection: true,
 
@@ -203,6 +205,17 @@ export function createView(el: MaybeComputedElementRef, elBounds: UseElementBoun
       const newZT = actions.getScaleToPointX(scaleFactor, p0)
       Object.assign(state.ZT, newZT)
       // debugger
+    },
+    animateTo(to: Partial<ZoomTransform>) {
+      animate({
+        from: { k: state.ZT.k, x: state.ZT.x },
+        to,
+        ease: easeInOut,
+        onUpdate: (v) => {
+          Object.assign(state.ZT, v)
+          actions.translateBy(0)
+        },
+      })
     },
     constrain(ZT: ZoomTransform) {
       const unwraped = unwrapedConstraints.value.translateConstraints

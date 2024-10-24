@@ -168,6 +168,7 @@ declare module "pulseplot/lib/bitbuffer.js" {
 declare module "pulseplot/lib/rfraw" {
   export class RfRaw {
     static getPulses(value: string): number[]
+    static getCodePulses(data: string): number[]
     static isRfRaw(data: string): boolean
   }
 }

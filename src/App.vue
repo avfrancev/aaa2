@@ -3,10 +3,10 @@
 </script>
 
 <template lang="pug">
-main(class="container mx-auto px-2 min-h-svh grid")
-  .flex.flex-col
-    Navbar
-    PulsesViewer.flex-1
+//- main(class="container mx-auto px-2 min-h-svh grid")
+main(class="container mx-auto px-2 min-h-svh flex flex-col max-sm:max-w-[100svw]")
+  Navbar
+  PulsesViewer
 </template>
 
 <style lang="sass">

@@ -68,7 +68,7 @@ svg(
   @keydown.right="(e) => { let d = (pulsesStore.pixelRatio.value * 10) / ZT.k; m.x1.value += d; m.x2.value += d }"
   @keydown.delete.d="(e) => { m.remove() }"
   @keydown.c="(e) => { m.changeColor() }"
-  @keydown.space.prevent="(e) => { m.locate() }"
+  @keydown.space.prevent="(e) => { m.locateMetaRef() }"
   )
   g
     path(
@@ -77,21 +77,11 @@ svg(
       :d="`M${0},${top} L${m.scaledWidth.value},${top} L${m.scaledWidth.value},${bottom} L${0},${bottom} z`"
       )
     path(
+      v-if="m.isSelected.value || m.isHovered.value"
       stroke-width="1"
       :stroke="m.color.value"
       :d="`M0,${top} V${bottom} M${m.scaledWidth.value},${top} V${bottom}`"
       )
-    path(
-      stroke-width="10"
-      stroke="transparent"
-      :d="`M0,${top} V${bottom} M${m.scaledWidth.value},${top} V${bottom}`"
-      )
-    path(
-      v-drag="resizeHandleHandler.bind(null, m, 'x1')"
-      class="stroke-transparent cursor-ew-resize"
-      stroke-width="10"
-      vector-effect="non-scaling-stroke"
-      :d="`M${m.x1.value >= m.x2.value ? m.scaledWidth.value : 0},${top} V${bottom}`")
     path(
       stroke-width="1"
       stroke-alignment="inner"
@@ -100,6 +90,12 @@ svg(
       fill="none"
       :d="`M0,${top} H${m.scaledWidth.value} M0,${bottom} H${m.scaledWidth.value}`"
       )
+    path(
+      v-drag="resizeHandleHandler.bind(null, m, 'x1')"
+      class="stroke-transparent cursor-ew-resize"
+      stroke-width="10"
+      vector-effect="non-scaling-stroke"
+      :d="`M${m.x1.value >= m.x2.value ? m.scaledWidth.value : 0},${top} V${bottom}`")
     path(
       v-drag="resizeHandleHandler.bind(null, m, 'x2')"
       class="stroke-transparent cursor-ew-resize"
