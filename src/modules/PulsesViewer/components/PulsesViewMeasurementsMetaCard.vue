@@ -80,16 +80,13 @@ div(
         i-mingcute:right-fill(v-if="!descOpened")
         i-mingcute:left-fill(v-if="descOpened")
 
-  div(v-show="descOpened" class="flex flex-col text-xs")
+  div(v-show="descOpened" class="flex ml-2 flex-col text-xs max-w-md")
     //- Decoder slicers buttons
-    div(class="ml-2 mb-2 join flex justify-stretch items-center gap-x-1")
-      //- label.cursor-pointer.label
-        span.label-text.mr-1 auto
-        input( type="checkbox" :checked="m.decoder.state.pickedSlicer === null" :value="" class="toggle toggle-sm")
+    div(class="mb-2 join flex justify-stretch items-center gap-x-1 ")
       button(
         class="btn btn-xs"
+        :class="{ ' btn-accent btn-outline': null === m.decoder.state.pickedSlicer }"
         @click="m.decoder.state.pickedSlicer = null"
-        :class="{ ' btn-accent btn-outline': null === m.decoder.state.pickedSlicer}"
         ) Auto
       button(
         v-for="s in Decoder.slicers"
@@ -98,19 +95,17 @@ div(
         :class="{ ' btn-secondary btn-outline': s === m.decoder.state.pickedSlicer || s === m.decoder.state.guessed?.modulation }"
         @click="() => (m.decoder.state.pickedSlicer = s)") {{ s }}
 
-    div(class="flex-1 ml-2 flex flex-col overflow-hidden max-w-sm overflow-x-auto text-xs")
-      div(class="flex join")
-      p(v-if="m.decoder.state.guessed" class="font-mono text-nowrap")
-      pre #[b Guessing modulation]: {{ m.decoder.state.guessed?.name }}
+    div.flex-1.overflow-hidden
+      pre.truncate #[b Guessing modulation]: {{ m.decoder.state.guessed?.name }}
       div(v-if="m.decoder.state.analyzer?.pulse_gap_skew && m.decoder.state.analyzer?.pulse_gap_skew !== Infinity")
-        pre #[b DC bias (Pulse/Gap skew)]: {{ ((m.decoder.state.analyzer?.pulse_gap_skew || 0) * 100).toFixed(1) }}%
+        pre.truncate #[b DC bias (Pulse/Gap skew)]: {{ ((m.decoder.state.analyzer?.pulse_gap_skew || 0) * 100).toFixed(1) }}%
         p
           |#[b Timings]: &nbsp;
           template(
             v-for="[k, v] in guessedValuesFiltered"
             :key="k"
             ) {{ k }}: #[b {{ v.toFixed(0) }} ] &nbsp;
-        pre #[b RfRaw (rx)]: {{ m.decoder.state.analyzer?.rfrawB1 }}
-        pre #[b RfRaw (tx)]: {{ m.decoder.state.analyzer?.rfrawB0 }}
-        pre(class="text-balances") #[b Bits]: {{ m.decoder.state.sliceGuess?.hex }}
+        pre.truncate #[b RfRaw (rx)]: {{ m.decoder.state.analyzer?.rfrawB1 }}
+        pre.truncate #[b RfRaw (tx)]: {{ m.decoder.state.analyzer?.rfrawB0 }}
+        pre.truncate(class="text-balances") #[b Bits]: {{ m.decoder.state.sliceGuess?.hex }}
 </template>

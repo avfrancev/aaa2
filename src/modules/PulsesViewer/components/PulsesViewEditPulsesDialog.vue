@@ -70,7 +70,7 @@ AlertDialogRoot
         class="h-[400px]"
         :class="parsed ? 'textarea-success' : 'textarea-error'")
       div(class="flex justify-end items-center gap-6")
-        div.text-muted.mr-auto Type: {{ parsed?.type }} | Total pulses: {{ totalPulses }}
+        div.text-muted.mr-auto(v-if="parsed") Type: {{ parsed?.type }} | Total pulses: {{ totalPulses }}
         AlertDialogCancel(class="btn btn-xs btn-ghost" @click="cancelSave") Cancel
         AlertDialogAction(
           class="btn btn-sm btn-success font-bold"
