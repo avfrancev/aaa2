@@ -1,10 +1,11 @@
+import type { Measurement } from "../models/Measurements"
 // import { currentSession } from "./sessions.store"
 import type { PulsesStorage } from "../models/Pulses"
 import { Pulses } from "../models/Pulses"
 // import viewStore from "./view.store"
 import { max, min } from "d3-array"
-import { scaleLinear, type ScaleLinear } from "d3-scale"
 
+import { scaleLinear, type ScaleLinear } from "d3-scale"
 import sample_data from "../store/sample_data.json"
 
 export class PulsesStore {
@@ -97,9 +98,17 @@ export class PulsesStore {
     return min
   }
 
-  removeAllMeasurements() {
+  allMeasurements = computed(() => {
+    const ms = new Set<Measurement>()
     for (const pulses of this.data) {
-      for (const m of pulses.measurements) m.remove()
+      for (const m of pulses.measurements) ms.add(m)
+    }
+    return ms
+  })
+
+  removeAllMeasurements() {
+    for (const m of this.allMeasurements.value) {
+      m.remove()
     }
   }
 }
