@@ -20,6 +20,21 @@ function onPulsesSave(val: IParsedPulses) {
 watchEffect(() => {
   viewStore.setScaleConstraints(pulsesStore)
 })
+// const ESP32PulsesStore = new PulsesStore("ESP32")
+// ESP32PulsesStore.loadFromStorage()
+
+const ESP32Store = useESP32()
+// console.log(ESP32Store, ESP32PulsesStore.allMeasurements.value)
+
+ESP32Store.onRMTMessage((data) => {
+  console.log(data)
+  if (useSessionsStore().currentSession.value !== "ESP32")
+    return
+  pulsesStore.add({ raw_data: data.parsed_buf, rssi: data.rssi })
+})
+// watchEffect(() => {
+//   console.log(ESP32Store.wsData)
+// })
 </script>
 
 <template lang="pug">

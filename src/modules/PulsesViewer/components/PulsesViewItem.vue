@@ -98,14 +98,14 @@ function onPulsesSave(val: IParsedPulses) {
 </script>
 
 <template lang="pug">
-div.relative(
+div.relative.mt-2(
   ref="itemEl"
   v-hover="(s: any) => { !isDropDownMoreOpen && pulses.setIsHovered(s.hovering) }"
   )
   //- pre {{ 20/view.ZT.k }}
   //- pre {{ pulses.isHovered }}
-  .h-10.flex
-    .actions.mt-2.relative(
+  .h-8.flex.items-center
+    .actions.relative(
       v-show="pulses.isHovered.value"
       class="join *:btn *:btn-sm *:text-md")
       button.join-item.btn-square
@@ -174,6 +174,10 @@ div.relative(
       //- span
       i-ph:check-circle-bold
       b Copied
+    div.ml-auto.text-xs.text-muted
+      div(
+        v-if="pulses.rssi"
+        ) RSSI: [ {{ pulses.rssi }} dBm]
 
   svg.w-full(
     v-drag="onItemDrag"

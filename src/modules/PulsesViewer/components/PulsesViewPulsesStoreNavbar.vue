@@ -14,6 +14,11 @@ function onPulsesSave(val: IParsedPulses) {
       pulsesStore.add(val.data)
   }
 }
+
+const pulsesStoreDataString = computed(() => {
+  return JSON.stringify([...pulsesStore.data])
+})
+const pulsesStoreDataClipboard = useClipboard({ source: pulsesStoreDataString })
 </script>
 
 <template lang="pug">
@@ -52,6 +57,15 @@ function onPulsesSave(val: IParsedPulses) {
     :disabled="[...pulsesStore.data].filter(p => p.xOffset.value !== 0).length === 0"
     @click="pulsesStore.data.forEach(p => p.setXOffset(0))")
       i-ph:align-left-fill
+  button(
+    v-if="pulsesStoreDataClipboard.isSupported.value"
+    class="join-item btn btn-sm"
+    title="Copy all pulses as json"
+    :class="[pulsesStoreDataClipboard.copied.value && 'btn-active btn-success']"
+    @click="pulsesStoreDataClipboard.copy()")
+      i-ph:check(v-if="pulsesStoreDataClipboard.copied.value")
+      i-ph:clipboard-text(v-else)
+      //- | {{ pulsesStoreDataClipboard.copied.value ? "Copied!" : "copy as json" }}
   .flex.w-full
     button(
       class="join-item btn btn-sm ml-auto"

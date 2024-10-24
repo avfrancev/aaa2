@@ -1,4 +1,3 @@
-import type { MeasurementStorage } from "./Measurements"
 import { bisector, extent, sum } from "d3-array"
 import { v4 as uuidv4 } from "uuid"
 import { Measurement } from "./Measurements"
@@ -34,11 +33,9 @@ export class Pulses {
       this.rssi = p.rssi
     const measurements = Array.from(p.measurements || [])
     if (measurements.length) {
-      nextTick(() => {
-        for (const m of measurements) {
-          this.addMeasurement(m.x1, m.x2, m.color)
-        }
-      })
+      for (const m of measurements) {
+        this.addMeasurement(m.x1, m.x2, m.color)
+      }
     }
   }
 
