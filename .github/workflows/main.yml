@@ -1,0 +1,14 @@
+name: Build Vue
+on: [push]
+jobs:
+  build_vue:
+    runs-on: ubuntu-latest
+    name: Build Vue
+    steps:
+    - uses: actions/checkout@v3
+    - id: Build-Vue
+      uses: nvkomata/VuePagesAction@1.1
+      with:
+        username: 'avfrancev'
+        reponame: 'aaa2'
+        token: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
