@@ -43,11 +43,13 @@ function onPulsesSave(val: IParsedPulses) {
   button(
     class="join-item btn btn-sm hover:btn-error"
     title="Remove all measurements"
+    :disabled="pulsesStore.allMeasurements.value.size === 0"
     @click="pulsesStore.removeAllMeasurements()")
       i-mdi:selection-remove
   button(
     class="join-item btn btn-sm"
     title="Reset all offsets"
+    :disabled="[...pulsesStore.data].filter(p => p.xOffset.value !== 0).length === 0"
     @click="pulsesStore.data.forEach(p => p.setXOffset(0))")
       i-ph:align-left-fill
   .flex.w-full
